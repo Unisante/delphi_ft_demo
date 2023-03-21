@@ -1,0 +1,110 @@
+\newpage
+
+
+```{r , include = FALSE}
+
+## DO NOT name the chunks to avoid warning about duplicates in chunk names during the loop
+
+## section ----
+## double-curly will extract the information within the loops - it needs the single quotes around it
+## inspired by https://gist.github.com/rmoff/a043676a2f084b81a434
+selected_section <- '{{current_section}}'
+
+label_selected_section <- glue::glue("label_section_{selected_section}")
+get(label_selected_section)
+
+(title_section <- get(label_selected_section))
+```
+
+# `r title_section`
+
+```{r }
+keyword <- paste0('section', selected_section)
+
+get_docx_to_pour(current_round, report_type, keyword)
+block_pour_docx(docx_to_get)
+
+
+# block_pour_docx(here::here("textes_intro", "ft3_per_participant_text_intro_sectionZ.docx"))
+```
+
+
+`
+
+```{r warning=FALSE, results='asis'}
+# type1 ----
+selected_type <- 'type1'
+selected_type_heading <- glue::glue("heading_questions_{selected_type}") |> get()
+
+selected_cols_txt <- glue::glue("cols_{selected_type}_{tolower(selected_section)}")
+
+selected_cols <- get0(selected_cols_txt)
+# selected_cols
+
+
+if (length(selected_cols) > 0) {
+  ## create the level 2 heading
+  cat(paste("\n##", selected_type_heading), "\n")
+  
+  
+  if (report_type == 'repgen') {
+    source(
+      here::here('code', '03a_create_flextable_results_type_1_generic.R'),
+      encoding = 'UTF-8'
+    )
+    flextable_to_rmd(ft_generic)
+  }
+  
+  if (report_type == 'per_participant') {
+    source(
+      here::here(
+        'code',
+        '04a_create_flextable_results_type_1_participants.R'
+      ),
+      encoding = 'UTF-8'
+    )
+    
+    flextable_to_rmd(ft_participant)
+  }
+  
+  # print two empty lines
+  cat("\n  <br><br>  \n")
+  
+  ## for loop for comments: create table with comments and print as rmd
+  
+  for (i in 1:length(selected_cols)) {
+    selected_statement_number <-
+      extract_statement_number(selected_comments[i])
+    
+    label_comment <-
+      lookup_final[variable == selected_comments[i], variable_label]
+    
+    dt_comments_m[statement_number == selected_statement_number,] %>%
+      create_flextable_comments_participant() %>%
+      flextable_to_rmd()
+    
+    # print two empty lines
+    cat("\n  <br><br>  \n")
+  }
+  
+  # print two empty lines and a page break
+  cat("\n\n\\newpage\n")
+}
+
+```
+
+## `r glue::glue("{heading_comment_section} {selected_section}")`
+
+```{r }
+# section_comment ----
+ 
+selected_section_comment <- paste0('dft3_', tolower(selected_section), '_comment')
+
+
+label_comment <- "Préambule - Commentaires"
+  # glue::glue("Section {selected_section} - Commentaires")
+
+
+dt_comments_m[variable == selected_section_comment] %>% create_flextable_comments_participant()
+
+```

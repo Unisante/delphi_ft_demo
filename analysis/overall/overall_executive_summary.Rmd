@@ -1,0 +1,301 @@
+---
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+output: 
+  officedown::rdocx_document:
+      base_format: bookdown::word_document2
+      page_margins:
+        bottom: 0.8
+        top: 0.8
+        right: 0.8
+        left: 0.8
+        header: 0.3
+        footer: 0.3
+        gutter: 0.3
+      reference_docx: template_exec_summary_bookdown.docx
+---
+
+
+```{r , include=FALSE}
+## adjust to names of *.docx if needed
+
+current_round <- "Executive"
+
+report_type <- "Summary"
+
+## . local functions ----------------------------------------------
+source(here::here('code', '00_functions.R'), encoding = 'UTF-8')
+
+## Title, subtitle and authors are defined in '00_parameters.R' which is sourced by '00_functions.R' so they can be added dynamically
+## see https://bookdown.org/yihui/rmarkdown-cookbook/dynamic-yaml.html for more details
+## 
+```
+
+---
+title: "`r {title_overall}`"
+subtitle: "`r {subtitle_overall}`" 
+author: "`r {authors_text}`"
+---
+
+
+```{r options, include=TRUE, echo=FALSE}
+
+
+pacman::p_load(knitr, officedown, officer)
+
+knitr::opts_chunk$set(
+  echo = FALSE,
+  comment = FALSE,
+  tab.lp = "Table :",
+  fig.lp = "Figure :",
+  ft.split=FALSE, 
+  ft.keepnext = FALSE)
+
+```
+
+
+
+
+```{r load_data, include=FALSE}
+## 0.a load libraries ----
+pacman::p_loaded()
+
+pacman::p_load(flextable, data.table, magrittr, ggplot2, ftExtra, sjPlot)
+
+pacman::p_loaded()
+
+
+load(here::here('output', 'RData', 'type1_zz_combined_round_2_3.RData'))
+
+# rm(type1_zz_combined_round_2_3)
+```
+
+
+```{r prepare_tables, include=FALSE}
+
+
+## txt_intro_local_files_short ----
+## table with details and path of local version of introduction texts
+get_txt_intro_local_files(path_texts_intro_local) # in 00_functions.R
+
+```
+
+
+# Situation
+
+
+```{r intro_situation}
+keyword <- 'situation'
+
+get_docx_to_pour(current_round, report_type, keyword)
+
+block_pour_docx(docx_to_get)
+```
+
+
+# Objectifs
+
+```{r intro_objectives}
+keyword <- 'objectives'
+
+get_docx_to_pour(current_round, report_type, keyword)
+
+block_pour_docx(docx_to_get)
+```
+
+# Méthode
+
+```{r intro_method}
+keyword <- 'method'
+
+get_docx_to_pour(current_round, report_type, keyword)
+block_pour_docx(docx_to_get)
+
+```
+
+
+
+
+```{r}
+# line below will import the png
+
+# https://stackoverflow.com/q/71003402/6176250
+
+
+```
+
+
+
+![](ExecutiveSummary_figure-Flow.png)
+
+
+
+# Messages-clés
+
+
+```{r intro_highlights}
+keyword <- 'highlights'
+
+get_docx_to_pour(current_round, report_type, keyword)
+block_pour_docx(docx_to_get)
+
+```
+
+
+\newpage
+
+<!---BLOCK_LANDSCAPE_START--->
+
+# Résultats
+
+```{r,include = FALSE}
+
+type1_zz_combined_round_2_3 %>% sjmisc::frq(group_exec_summary)
+
+```
+
+
+```{r ,include = FALSE}
+## Consensual agreement reached
+## Accord consensuel atteint
+
+
+t1a <- type1_zz_combined_round_2_3[group_exec_summary == 'agree_with_consensus',]
+
+label_var_execsummary <- label_execsummary_agree_consensus_yes
+
+names(t1a)
+
+ft_type1_exec <- t1a %>% create_flextable_type_1_exec_summary()
+
+# ft_type1_exec
+
+
+row_loc <- rle(cumsum( ft_type1_exec$body$spans$columns[,1] ))$values
+
+
+border <- fp_border(color = border_color) 
+
+ft_type1_exec <- ft_type1_exec %>%
+  hline(border = border,
+         i = row_loc
+        ) 
+# ft_type1_exec
+ft_type1_exec <- ft_type1_exec %>% hline_bottom(border = border )
+
+
+```
+
+
+```{r ,tab.cap = NULL}
+
+ft_type1_exec
+
+```
+
+  
+
+\newpage
+
+
+```{r ,include = FALSE}
+## Consensual disagreement reached
+## Désaccord consensuel atteint
+
+t1b <- type1_zz_combined_round_2_3[group_exec_summary == 'disagree_with_consensus',]
+
+label_var_execsummary <- label_execsummary_disagree_consensus_yes
+
+names(t1b)
+
+ft_type1_exec <- t1b %>% create_flextable_type_1_exec_summary()
+
+# ft_type1_exec
+
+
+row_loc <- rle(cumsum( ft_type1_exec$body$spans$columns[,1] ))$values
+
+
+border <- fp_border(color = border_color) 
+
+ft_type1_exec <- ft_type1_exec %>%
+  hline(border = border,
+        i = row_loc
+  ) 
+# ft_type1_exec
+ft_type1_exec <- ft_type1_exec %>% hline_bottom(border = border )
+
+
+```
+
+
+```{r ,tab.cap = NULL}
+
+ft_type1_exec
+
+```
+
+
+
+\newpage
+
+
+```{r ,include = FALSE}
+## No consensus reached
+## Absence de consensus
+
+## subset rows ----
+t2a <-
+  type1_zz_combined_round_2_3[group_exec_summary %in% c('no_agree',
+                                                        'agree_without_consensus',
+                                                        'disagree_without_consensus'), ]
+
+## reorder as will be in same group
+setorder(t2a, section_order, type)
+
+
+## get rid of rows that are duplicates
+## https://stackoverflow.com/a/34753051/6176250
+t2 <- t2a[, head(.SD, 1), .(section, type, variable)]
+
+
+label_var_execsummary <- label_execsummary_consensus_no
+
+names(t2)
+
+t2
+
+ft_type1_exec <- t2 %>% create_flextable_type_1_exec_summary()
+
+# border <- fp_border(color = border_color) 
+
+row_loc <- rle(cumsum( ft_type1_exec$body$spans$columns[,1] ))$values
+
+
+
+ft_type1_exec <- ft_type1_exec %>%
+  hline(border = border,
+         i = row_loc
+        ) 
+# ft_type1_exec
+ft_type1_exec <- ft_type1_exec %>% hline_bottom(border = border )
+
+
+```
+
+
+```{r , tab.cap = NULL}
+
+ft_type1_exec
+
+```
+
+
+
+<!---BLOCK_LANDSCAPE_STOP--->
+
+
+
+
+
+
+

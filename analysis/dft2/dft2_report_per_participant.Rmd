@@ -1,0 +1,219 @@
+---
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+output: 
+  officedown::rdocx_document:
+      base_format: bookdown::word_document2
+      page_margins:
+        bottom: 0.8
+        top: 0.8
+        right: 0.8
+        left: 0.8
+        header: 0.3
+        footer: 0.3
+        gutter: 0.3
+      reference_docx: template-bookdown.docx
+params:
+  record_id_selected: 5
+---
+
+
+```{r elements_to_update, include=FALSE}
+
+## current_round_number ---------
+current_round_number <- 2
+
+## report_type --------
+report_type <- 'per_participant' ## individualised report
+
+
+## record_id_selected for parametrised reports ----------
+## here we put #5 but it will be used in 0_run_ME_dft2.R to iterate through a list
+record_id_selected <- params$record_id_selected
+
+
+## Title, subtitle and authors are defined in '00_parameters.R' which is sourced by '00_functions.R' so they can be added dynamically
+## see https://bookdown.org/yihui/rmarkdown-cookbook/dynamic-yaml.html for more details
+## 
+## . local functions ----------------------------------------------
+source(here::here('code', '00_functions.R'), encoding = 'UTF-8')
+
+
+current_round <- paste0('dft', current_round_number)
+
+title_round <- glue::glue("title_round_{current_round_number}") |> get()
+```
+
+
+---
+title: "`r {title_round}`"
+subtitle: "`r glue::glue("{subtitle_participant} {params$record_id_selected}")`" 
+author: "`r {authors_text}`"
+---
+
+
+```{r options, include=FALSE, echo=FALSE}
+
+
+pacman::p_load(knitr, officedown, officer)
+
+knitr::opts_chunk$set(
+  echo = FALSE,
+  comment = FALSE,
+  tab.lp = "Table :",
+  fig.lp = "Figure :",
+  ft.split=FALSE, 
+  ft.keepnext = FALSE)
+```
+
+
+
+
+
+```{r load_data, include=FALSE}
+
+## . load libraries ----
+pacman::p_loaded()
+
+pacman::p_load(flextable, data.table, magrittr, ggplot2, ftExtra, sjPlot)
+
+pacman::p_loaded()
+
+
+## . load RData from data/dft2 ----
+files_to_load_1 <- c('dft2_data_clean',
+                     'dft2_lookup_final',
+                     'dft2_lookup_value_labels_final')
+
+### .. put them in a tibble and create filename including path ----
+list_files_1 <- tibble::tibble(
+  files_to_load = files_to_load_1,
+  files = paste0(files_to_load, '.RData'),
+  filename = here::here('data', 'dft2', files)
+)
+
+
+## . load RData from output/RData ----
+### .. create a list of RData to load ----
+files_to_load_2 <- c(
+  'dft2_type0_zz1',
+  'dft2_type1_zz_combined',
+  'dft2_type2_zz1',
+  'dft2_type3_zz1',
+  'dft2_dt_comments_m'
+)
+
+### .. put them in a tibble and create filename including path ----
+list_files_2 <- tibble::tibble(
+  files_to_load = files_to_load_2,
+  files = paste0(files_to_load, '.RData'),
+  filename = here::here('output', 'RData', files)
+)
+
+## combine the two lists ----
+list_files <- rbind(list_files_1, list_files_2)
+
+### .. purrr::walk the list to load the RData with ad hoc function ----
+list_files %>% purrr::walk2(.x = .$files_to_load, .y = .$filename, .f = ~ load_if_not_loaded(.x, .y))
+
+
+
+
+### . rename some elements used later ----
+### not the cleanest but as objects are small it has no impact on performance
+# selected_table <- glue::glue('{current_round}_type1_zz_combined')
+
+data_clean <- glue::glue('{current_round}_data_clean') %>% get()
+lookup_final <- glue::glue('{current_round}_lookup_final') %>% get()
+dt_comments_m <- glue::glue('{current_round}_dt_comments_m') %>% get()
+
+```
+
+
+
+```{r prepare_tables, include=FALSE}
+## record_id_selected ----
+# record_id_selected <- params$record_id_selected
+
+## total_participants ----
+(total_participants <- data_clean[,.N])
+
+
+label_proportion <- glue::glue('Proportion (N = {total_participants})')
+
+## 01d_dft2_define_cols.R ----
+source(here::here('code', 'dft2','01c_dft2_define_cols.R'), encoding = 'UTF-8')
+
+## 02b_dft2_prepare_tables_participants.R ----
+source(here::here('code', 'dft2', '02b_dft2_prepare_tables_participants.R'), encoding = 'UTF-8')
+
+
+## txt_intro_local_files_short ----
+## table with details and path of local version of introduction texts
+get_txt_intro_local_files(path_texts_intro_local) # in 00_functions.R
+```
+
+
+
+```{r email, include=FALSE}
+email <- data_clean[record_id == record_id_selected, dft2_0_email]
+# email
+```
+
+`r glue::glue("{email_recipient_text} {email}")`
+
+
+
+```{r intro, child = '../00_child_intro_method.Rmd'}
+
+```
+
+
+
+
+\newpage
+
+## `r {heading_participants_characteristics}`
+<br> 
+
+```{r ft_table1, include = FALSE}
+
+table_caption <- heading_participants_characteristics
+
+cols_for_table1_generic <- dft2_type0_zz1[, names(.SD), .SDcols = !c('variable', 'item')]
+# cols_for_table1_generic
+# class(dft2_type0_zz1)
+
+ft_table1 <- 
+  dft2_type0_zz1 %>%
+  create_flextable_table1(cols_for_table1_generic, label_proportion)
+
+
+
+```
+
+```{r, tab.cap = table_caption}
+ft_table1
+```
+
+
+
+```{r sections, include=FALSE}
+## sections
+## inspired by https://gist.github.com/rmoff/a043676a2f084b81a434
+
+out = NULL    ## important to define it as NULL before starting the loop
+rmd_to_loop <-  here::here("analysis", current_round, glue::glue("{current_round}_child_section.Rmd"))
+
+## create and then update an objet called 'out' by the result of the 'xx_child_section.Rmd' for the current_section to the existing 'out'
+for (i in list_sections) {
+  current_section <- i
+  out = c(out, knit_expand(rmd_to_loop))
+}
+
+
+```
+
+<!-- paste the elements of the object 'out' separated by a newline -->
+
+`r paste(knit(text = out), collapse = '\n')`
+

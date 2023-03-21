@@ -1,0 +1,42 @@
+# `r {heading_situation}` 
+
+```{r intro_situation}
+keyword <- 'situation'
+
+## put the appropriate text in this section
+get_docx_to_pour(current_round, report_type, keyword)
+block_pour_docx(docx_to_get)
+```
+
+
+
+# `r {heading_method}` 
+
+```{r intro_method}
+keyword <- 'method'
+
+## put the appropriate text in this section
+get_docx_to_pour(current_round, report_type, keyword)
+block_pour_docx(docx_to_get)
+
+```
+
+
+\newpage
+
+
+# `r {heading_toc}` 
+<br> 
+
+<!---BLOCK_TOC--->
+
+\newpage
+
+# `r {heading_list_tables}` 
+<br> 
+
+```{r}
+block_toc(style = "Table Caption")
+```
+
+
