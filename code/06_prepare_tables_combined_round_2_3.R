@@ -48,25 +48,14 @@ type1_zz_combined_round_2_3 <- rbindlist(list(dft2_type1_zz_combined, dft3_type1
 
 type1_zz_combined_round_2_3[, dft_round := stringr::str_extract(variable, "[0-9]+")]
 
-## .. agreement_and_consensus ----
-## in both rounds
-type1_zz_combined_round_2_3[agreement == 'ok' &
-                              consensus == 'ok', 
-                            agreement_and_consensus := 1]
-
 ## .. group_exec_summary ----
-## agree_with_consensus in round 2 --
-## make sure to update statement_numbers_in_dft2_to_keep_for_execsummary in 000_parameters.R
-## some of the statements of round 2 have been refined in dft3, so are not kept in executive summary
-type1_zz_combined_round_2_3[dft_round == 2 &
-                              statement_number %in% statement_numbers_in_dft2_to_keep_for_execsummary,
-                            group_exec_summary := 'agree_with_consensus']
+## agree_with_consensus in round 2 and 3 --
+## for each round
+type1_zz_combined_round_2_3[agreement == 'ok' & consensus == 'ok',
+                            `:=`(agreement_and_consensus = 1,
+                                 group_exec_summary = 'agree_with_consensus')]
 
-## agree_with_consensus in round 3 --
-type1_zz_combined_round_2_3[dft_round == 3 &
-                              agreement == 'ok' &
-                              consensus == 'ok', 
-                            group_exec_summary := 'agree_with_consensus']
+## statements of round 2 that did not reach consensus have been refined in dft3, so are not kept in executive summary
 
 ## disagree_with_consensus in round 3 --
 type1_zz_combined_round_2_3[dft_round == 3 &
