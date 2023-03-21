@@ -1,14 +1,14 @@
 ## 02b_dft2_prepare_tables_participants.R
 ## olivier.duperrex@unisante.ch
-## 2022-09-26
+## 2023-03-21
 
-### . > cols_type1 ----
-### select cols endign with _type1
+## . > cols_type1 ----
+## select cols endign with _type1
 cols_type1 
 
 
-### .. dft2_dt_type1_m ----
-### subset and metl
+## .. dft2_dt_type1_m ----
+## subset and metl
 dft2_dt_type1_m <- data_clean[, .SD, .SDcols = c('record_id', cols_type1)] %>%
   melt('record_id', value.name = "item", na.rm = T) %>%
   sjlabelled::remove_label()
@@ -45,13 +45,13 @@ dft2_type1_zz_combined_id_selected %>% names()
 
 
 ## . ----
-### . > cols_type2 ----
+## . > cols_type2 ----
 cols_type2
 
 ## . dft2_dt_type2 -----------------------------------------------------
 dft2_dt_type2 <- data_clean[, lapply(.SD, sjlabelled::as_label), .SDcols = c('record_id', cols_type2)]
 
-# ### . dft2_dt_type2_m : melted table by record id ----------------------
+## . dft2_dt_type2_m : melted table by record id ----------------------
 dft2_dt_type2_m <- dft2_dt_type2 %>%
   melt('record_id', value.name = "item", na.rm = T) %>%
   sjlabelled::remove_label()
@@ -67,7 +67,7 @@ dft2_type2_zz0_id_selected <- dft2_dt_type2_m[record_id == record_id_selected, .
 dft2_type2_zz0_id_selected
 
 ## . dft2_type2_zz1_id_selected ----
-## make sure not to keep responses_participant from previous round !!! ----
+## make sure not to keep responses_participant from previous round !!! ---
 
 if('responses_participant' %in% names(dft2_type2_zz1)) {
   
@@ -83,11 +83,21 @@ dft2_type2_zz1_id_selected <- dft2_type2_zz1[dft2_type2_zz0_id_selected, on = .(
 dft2_type2_zz1_id_selected[, responses_participant := fifelse(responses_participant == 1, 'X', '')]
 # dft2_type2_zz1_id_selected
 
+## . order rows according to results ----
+## this will sort the table by ... and keep no opinion and other at the end
+names(dft2_type2_zz1_id_selected)
+
+dft2_type2_zz1_id_selected <- dft2_type2_zz1_id_selected[order(
+  variable,                                ## ... variable name
+  value_labels %like% no_op_short,         ## ... no opinion: no then yes
+  value_labels %like% other_please_short,  ## ... other : no then yes
+  -prop                                    ## ... decreasing proportion
+)]
 
 
 
 ## . ----
-### . > cols_type3 --------------------------------------------------
+## . > cols_type3 --------------------------------------------------
 
 cols_type3_in_data_clean <- data_clean[, names(.SD), .SDcols = patterns('_type3___')]
 cols_type3_in_data_clean
@@ -128,6 +138,15 @@ dft2_type3_zz1_id_selected <- dft2_type3_zz1_id_selected[dft2_type3_zz1, on = 'i
 
 dft2_type3_zz1_id_selected[, responses_participant := fifelse(responses_participant == 1, 'X', '')]
 # dft2_type3_zz1_id_selected
+
+### .  order rows according to results ----
+## this will sort the table by ... and keep no opinion and other at the end
+dft2_type3_zz1_id_selected <- dft2_type3_zz1_id_selected[order(
+  variable,                                ## ... variable name
+  value_labels %like% no_op_short,         ## ... no opinion: no then yes
+  value_labels %like% other_please_short,  ## ... other : no then yes
+  -prop                                    ## ... decreasing proportion
+)]
 
 
 ## . ----
