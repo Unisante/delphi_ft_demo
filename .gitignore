@@ -1,0 +1,9 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+data
+output
+texts_intro
+*.html
+delphi_ft_demo.Rproj
