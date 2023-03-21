@@ -294,10 +294,11 @@ dft2_lookup_final <- rbindlist(list(dft2_lookup_initial,
 dft2_lookup_final[, variable_label := clean_variable_label(variable_label, thankyou_string)]
 
 
-dft2_lookup_final[!(variable_label %like% 'SECTION'), variable_label := stringr::str_replace(variable_label, comment_txt_singular, comment_txt_plural)]
+dft2_lookup_final[!(variable_label %like% 'SECTION'), variable_label := stringr::str_replace_all(variable_label, comment_txt_singular, comment_txt_plural)]
 
-dft2_lookup_final[!(variable_label %like% 'SECTION'), variable_label := stringr::str_replace(variable_label, ' ;', ' -')]
+dft2_lookup_final[!(variable_label %like% 'SECTION'), variable_label := stringr::str_replace_all(variable_label, ' ;', ' -')]
 
+dft2_lookup_final[, variable_label := stringr::str_replace_all(variable_label, '"', '')]
 
 
 

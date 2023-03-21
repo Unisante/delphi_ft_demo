@@ -129,10 +129,13 @@ dft3_lookup_final[, variable_label := clean_variable_label(variable_label, thank
 
 
 dft3_lookup_final[!(variable_label %like% 'SECTION'), 
-             variable_label := stringr::str_replace(variable_label, comment_txt_singular, comment_txt_plural)]
+             variable_label := stringr::str_replace_all(variable_label, comment_txt_singular, comment_txt_plural)]
 
 dft3_lookup_final[!(variable_label %like% 'SECTION'), 
-             variable_label := stringr::str_replace(variable_label, ' ;', ' -')]
+             variable_label := stringr::str_replace_all(variable_label, ' ;', ' -')]
+
+
+dft3_lookup_final[, variable_label := stringr::str_replace_all(variable_label, '"', '')]
 
 
 ## 6. clean and deduplicate by collapsing ---------------------------
