@@ -1,11 +1,21 @@
 ## 06_prepare_tables_combined_round_2_3.R
 ## olivier.duperrex@unisante.ch
-## 2023-03-13
+## 2023-04-17
 
 ## this script will combine only the type1 tables and graphs without individual data
 ## from dft2 (round 2) and dft3 (round 3)
 ## 
-## 
+
+## 000. elements for executive summary --------------------------------
+## . statement_numbers_in_dft2_to_keep_for_execsummary ----
+## some of the statements of round 2 have been refined in dft3, so are not kept in executive summary
+## update this line after round 2 is finished
+
+statement_numbers_in_dft2_to_keep_for_execsummary <- ""
+# c(4, 11, 18)
+
+
+
 ## 0.a load libraries ----
 pacman::p_loaded()
 
@@ -18,22 +28,20 @@ source(here::here('code', '00_functions.R'), encoding = 'UTF-8')
 
 ## 1. load RData ----
 ### 1.1 create a list of RData to load ----
-files_to_load <- c(
-  'dft2_type1_zz_combined',
-  'dft3_type1_zz_combined'
-)
+files_to_load <-
+  c('dft2_type1_zz_combined',
+    'dft3_type1_zz_combined')
 
 ### 1.2. put them in a tibble and create filename including path ----
-list_files <- tibble::tibble(
-  files_to_load = files_to_load,
-  files = paste0(files_to_load, '.RData'),
-  filename = here::here('output', 'RData', files)
-)
+list_files <-
+  tibble::tibble(
+    files_to_load = files_to_load,
+    files = paste0(files_to_load, '.RData'),
+    filename = here::here('output', 'RData', files)
+  )
 
 ### 1.3. purrr::walk the list to load the RData ----
 purrr::walk(list_files$filename, load, envir = .GlobalEnv)
-
-
 
 
 ## 2. combine them ----
@@ -41,7 +49,8 @@ purrr::walk(list_files$filename, load, envir = .GlobalEnv)
 
 # setdiff(names(type1_zz_combined_round_2), names(type1_zz_combined))
 
-type1_zz_combined_round_2_3 <- rbindlist(list(dft2_type1_zz_combined, dft3_type1_zz_combined))
+type1_zz_combined_round_2_3 <- 
+  rbindlist(list(dft2_type1_zz_combined, dft3_type1_zz_combined))
 
 
 ## 3. create variables for exec summary ----
@@ -49,9 +58,20 @@ type1_zz_combined_round_2_3 <- rbindlist(list(dft2_type1_zz_combined, dft3_type1
 type1_zz_combined_round_2_3[, dft_round := stringr::str_extract(variable, "[0-9]+")]
 
 ## .. group_exec_summary ----
-## agree_with_consensus in round 2 and 3 --
-## for each round
-type1_zz_combined_round_2_3[agreement == 'ok' & consensus == 'ok',
+## agree_with_consensus in round 2 --
+## make sure to update statement_numbers_in_dft2_to_keep_for_execsummary on the top of this page
+## some of the statements of round 2 have been refined in dft3, so are not kept in executive summary
+
+type1_zz_combined_round_2_3[dft_round == 2 &
+                              statement_number %in% statement_numbers_in_dft2_to_keep_for_execsummary,
+                            `:=`(agreement_and_consensus = 1,
+                                 group_exec_summary = 'agree_with_consensus')]
+
+## agree_with_consensus in round  3 --
+
+type1_zz_combined_round_2_3[dft_round == 3 &
+                              agreement == 'ok' & 
+                              consensus == 'ok',
                             `:=`(agreement_and_consensus = 1,
                                  group_exec_summary = 'agree_with_consensus')]
 
@@ -95,12 +115,17 @@ writexl::write_xlsx(
 names(type1_zz_combined_round_2_3)
 
 ## .. get the list of values ----
-list_group_exec_summary <- type1_zz_combined_round_2_3[!is.na(group_exec_summary), unique(group_exec_summary)]
-list_section <- type1_zz_combined_round_2_3[!is.na(section), unique(section)]
+list_group_exec_summary <- 
+  type1_zz_combined_round_2_3[!is.na(group_exec_summary), unique(group_exec_summary)]
+
+list_section <- 
+  type1_zz_combined_round_2_3[!is.na(section), unique(section)]
 
 ## .. create a new empty table ----
 ## using Cross-Join from data.table
-dt0 <- CJ(group_exec_summary = list_group_exec_summary, section = list_section)
+dt0 <- 
+  CJ(group_exec_summary = list_group_exec_summary, 
+     section = list_section)
 
 ## .. add type ---
 dt0[, type := 'text']
@@ -110,7 +135,8 @@ type1_zz_combined_round_2_3 <-
   rbindlist(list(type1_zz_combined_round_2_3, dt0), fill = TRUE)
 
 ## .. reorder ----
-type1_zz_combined_round_2_3 <- type1_zz_combined_round_2_3[order(group_exec_summary, section, type)]
+type1_zz_combined_round_2_3 <- 
+  type1_zz_combined_round_2_3[order(group_exec_summary, section, type)]
 
 
 ## 4.2 recode section ----
@@ -135,18 +161,23 @@ type1_zz_combined_round_2_3[, section_order := fcase(
   )]
 
 
-chk_recode_section <- type1_zz_combined_round_2_3[, .N, keyby = .(section_order, section, section_txt)]
+chk_recode_section <- 
+  type1_zz_combined_round_2_3[, .N, keyby = .(section_order, section, section_txt)]
+
 chk_recode_section
 
 
 ## 4.3 img_path ----
 ## define the path and the name of the image to correspond to variable name
-type1_zz_combined_round_2_3[!is.na(variable), img_path := here::here('output', 'png', paste0(variable, ".png"))]
+type1_zz_combined_round_2_3[!is.na(variable), 
+                            img_path := here::here('output', 'png', paste0(variable, ".png"))]
 
 
-setcolorder(type1_zz_combined_round_2_3, c('dft_round', 'group_exec_summary', 'section_order', 'section', 'section_txt'))
+setcolorder(type1_zz_combined_round_2_3, 
+            c('dft_round', 'group_exec_summary', 'section_order', 'section', 'section_txt'))
 
-setorder(type1_zz_combined_round_2_3, group_exec_summary, section_order)
+setorder(type1_zz_combined_round_2_3, 
+         group_exec_summary, section_order)
 
 ## https://stackoverflow.com/a/37881577/6176250
 ## setorder(dumdt[, .r := order(to_ord)], .r)[, .r := NULL]
