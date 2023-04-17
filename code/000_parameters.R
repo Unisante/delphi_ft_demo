@@ -48,10 +48,6 @@ email_tester <- 'participant_27@some.email'
 ## . reports titles -----------------------------------------------
 project_text <- "Delphi fast-track – Puff Bars"
 
-
-title_overall <- "Cigarettes électroniques jetables : réglementer?"  # for overall executive summary 
-subtitle_overall <- "Consensus d'expert selon une approche 'Delphi-Fast track'"
-
 title_round_2 <-   glue::glue("{project_text} – 2e étape")
 title_round_3 <-   glue::glue("{project_text} – 3e étape")
 
@@ -333,6 +329,26 @@ label_scale        <- "(1) Désaccord total ...\n... Accord total (9)"
 breaks_gg <- min_scale_delphi:max_scale_delphi
 limits_gg <- c(min_scale_delphi - 1,
                max_scale_delphi + 1)
+
+
+
+
+
+
+
+
+## 4. elements for executive summary --------------------------------
+title_overall <- "Cigarettes électroniques jetables : réglementer?"  # for overall executive summary 
+subtitle_overall <- "Consensus d'expert selon une approche 'Delphi-Fast track'"
+
+
+## . statement_numbers_in_dft2_to_keep_for_execsummary ----
+## some of the statements of round 2 have been refined in dft3, so are not kept in executive summary
+## update this line after round 2 is finished
+
+# statement_numbers_in_dft2_to_keep_for_execsummary <- ""
+statement_numbers_in_dft2_to_keep_for_execsummary <- c(4, 11, 18)
+
 
 
 
