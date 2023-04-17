@@ -8,12 +8,12 @@
 ## section ----
 ## double-curly will extract the information within the loops - it needs the single quotes around it
 ## inspired by https://gist.github.com/rmoff/a043676a2f084b81a434
+
 selected_section <- '{{current_section}}'
 
-label_selected_section <- glue::glue("label_section_{selected_section}")
-get(label_selected_section)
+label_selected_section <- glue::glue("label_section_{selected_section}") |> get()
 
-(title_section <- get(label_selected_section))
+title_section <- label_selected_section
 ```
 
 # `r title_section`
@@ -92,16 +92,26 @@ if (length(selected_cols) > 0) {
 
 ```
 
-## `r glue::glue("{heading_comment_section} {selected_section}")`
+
+## `r glue::glue("{heading_comment_section} {label_selected_section}")`
 
 ```{r }
 # section_comment ----
- 
-selected_section_comment <- paste0('dft3_', tolower(selected_section), '_comment')
 
+selected_section_comment <- paste0('dft2_', tolower(selected_section), '_comment')
 
-label_comment <- "Préambule - Commentaires"
-  # glue::glue("Section {selected_section} - Commentaires")
+if (selected_section == 'Z') {
+  
+  label_comment <-
+    glue::glue("{label_selected_section} - {comment_txt_plural}")
+
+  } else {
+    
+  label_comment <-
+    glue::glue("Section {selected_section} - {comment_txt_plural}")
+  
+}
+
 
 
 dt_comments_m[variable == selected_section_comment] %>% create_flextable_comments_participant()
