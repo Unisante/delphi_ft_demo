@@ -11,6 +11,7 @@
 ## some of the statements of round 2 have been refined in dft3, so are not kept in executive summary
 ## update this line after round 2 is finished
 
+# statement_numbers_in_dft2_to_keep_for_execsummary <- ""
 statement_numbers_in_dft2_to_keep_for_execsummary <- c(4, 11, 18)
 
 
