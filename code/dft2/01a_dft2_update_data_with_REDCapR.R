@@ -1,6 +1,6 @@
 ## 01a_dft2_update_data_with_REDCapR.R ----
 ## olivier.duperrex@unisante.ch
-## 2023-03-13
+## 2023-04-17
 ## 
 ## 
 
@@ -41,7 +41,8 @@ source(here::here('code', '000_parameters.R'), encoding = 'UTF-8')
 source(path_to_my_token, encoding = 'UTF-8') # returns uri_redcap_your_institution and token_dft2_your_project
 
 
-token <-  token_dft2
+token <-  
+  token_dft2
 
 ## 1.0 metadata ------------------------------------------------------
 dft2_metadata <-
@@ -64,7 +65,7 @@ data.table::setDT(dft2_metadata)
 
 ## 1.1 select fields ------------------------------------------------
 ## all - activate line below for all fields
-desired_fields_v2  <- c("")
+desired_fields_v2 <- c("")
 
 ## a selection - modify line below as needed
 # desired_fields_v2 <- c("feil, uc_ser_bon_sero")
@@ -77,16 +78,17 @@ raw_or_label_headers <- "raw"  # variable/field names (raw) or the field labels 
 
 ## 1.3 load the data - REDCapR --------------------------------------
 
-dft2_data_redcapr_raw <- REDCapR::redcap_read_oneshot(
-  redcap_uri = redcap_uri,
-  token      = token,
-  #fields  = requested_fields_SHS,
-  fields_collapsed = desired_fields_v2,
-  raw_or_label = raw_or_label, 
-  raw_or_label_headers = raw_or_label_headers
-  #filter_logic = filters,
-  #batch_size = guess_max
-)$data %>%
+dft2_data_redcapr_raw <-
+  REDCapR::redcap_read_oneshot(
+    redcap_uri = redcap_uri,
+    token      = token,
+    #fields  = requested_fields_SHS,
+    fields_collapsed = desired_fields_v2,
+    raw_or_label = raw_or_label,
+    raw_or_label_headers = raw_or_label_headers
+    #filter_logic = filters,
+    #batch_size = guess_max
+  )$data %>%
   data.table::setDT()
 
 
