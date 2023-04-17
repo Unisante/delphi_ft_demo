@@ -49,7 +49,7 @@ type1_zz_combined_round_2_3[, dft_round := stringr::str_extract(variable, "[0-9]
 
 ## .. group_exec_summary ----
 ## agree_with_consensus in round 2 --
-## !! make sure you have updated statement_numbers_in_dft2_to_keep_for_execsummary in sectin 4 of 000_parameters.R !! ----
+## !! make sure you have updated statement_numbers_in_dft2_to_keep_for_execsummary in section 4 of 000_parameters.R !! ----
 ## some of the statements of round 2 have been refined in dft3, so are not kept in executive summary
 
 type1_zz_combined_round_2_3[dft_round == 2 &
