@@ -167,9 +167,9 @@ list_sections <- c('Z', 'A', 'B', 'C')
 
 label_section_Z_long  <- "Problématique et interdiction de vente"
 label_section_Z       <- "Préambule"
-label_section_A       <- "Composition du produit & aspects marketing"
-label_section_B       <- "Vente, consommation, taxation & prix"
-label_section_C       <- "Aspects écologiques & éléments transversaux"
+label_section_A       <- "Section A - Composition du produit & aspects marketing"
+label_section_B       <- "Section B - Vente, consommation, taxation & prix"
+label_section_C       <- "Section C - Aspects écologiques & éléments transversaux"
 
 list_labels_sections  <- c(label_section_Z_long, label_section_A, label_section_B, label_section_C)
 
@@ -295,8 +295,8 @@ labels_0b_s1 <- 'Enoncé 1 : Les Puff Bars représentent un problème pour la sa
 
 ## . metadata : separator for comments in field_name ----
 
-# separator_comment_statements <- "destin" - used with demo data
-separator_comment_statements <- " to qualify"
+separator_comment_statements <- "destin" ## used with demo data
+# separator_comment_statements <- " to qualify"
 
 ## 3. elements for plots  -------------------------------------------
 ## 
