@@ -1,8 +1,8 @@
-# Delphi Fast Track : code with demo data and results
+# Fast-track Delphi: code with demo data and results
 
 ## Purpose
 
-The `Delphi fast-track` was developed by [Unisanté](https://www.unisante.ch/) to provide consensus information for political decisions in context of public health crisis.
+The `fast-track Delphi` was developed by [Unisanté](https://www.unisante.ch/) to provide consensus information for political decisions in context of public health crisis.
 
 The process consists in three rounds of consultation. The participants are brought together in a first round during which a series of topics/questions/statements will be collected using a nominal group technique (NGT). The participants then express their opinion on these statements by responding individually to questions in the second and third rounds using an online questionnaire built with [**`REDCapR`**](https://ouhscbbmc.github.io/REDCapR/).
 
@@ -27,7 +27,7 @@ In order to produce results in a very short time frame, we use an [R project](ht
 
 ## User guide
 
-Please go through the [Delphi fast-track : user guide](https://github.com/Unisante) to discover the steps with demo data, see what it produces and then try it out.
+Please go through the [Fast-track Delphi: user guide](https://github.com/Unisante) to discover the steps with demo data, see what it produces and then try it out.
 
 
 
@@ -37,4 +37,4 @@ Please go through the [Delphi fast-track : user guide](https://github.com/Unisan
 
 ![CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png){fig-align="left"}
 
-Citation: Duperrex O and Velarde Crézé C. Delphi fast-track : code with demo data and results. 2023. Département Promotion de la santé et préventions, Unisanté, Lausanne, Suisse. Available from: [https://github.com/Unisante/](Available from: https://github.com/Unisante/)
+Citation: Duperrex O and Velarde Crézé C. Fast-track Delphi: code with demo data and results. 2023. Département Promotion de la santé et préventions, Unisanté, Lausanne, Suisse. Available from: [https://github.com/Unisante/](Available from: https://github.com/Unisante/)
