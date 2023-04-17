@@ -95,7 +95,6 @@ if (length(selected_cols) > 0) {
 
 
 
-<br> <br> 
   
 ```{r results='asis'}
 

@@ -29,7 +29,6 @@ block_pour_docx(docx_to_get)
 ```
 
 
-`
 
 ```{r warning=FALSE, results='asis'}
 # type1 ----
