@@ -177,7 +177,10 @@ list_labels_sections  <- c(label_section_Z_long, label_section_A, label_section_
 
 
 ## . label txt ----
-colon_punctuation_txt <- ": " ## english ": " - french " : "
+## .. colon_punctuation_txt ----
+##  english ": " (no space before)
+##  french " : " (one space before)
+colon_punctuation_txt <- " : "    
 
 statement_txt         <- 'Enoncé'
 item_txt_type_2_3     <- 'Options'
