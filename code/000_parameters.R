@@ -42,7 +42,7 @@ path_texts_intro_local <- here::here('texts_intro')
 authors_text <- "Camille Velarde Crézé, Luc Lebon, Vincent Faivre, Olivier Duperrex - Unisanté"
 
 ## . email_tester ---------------------------------------------------
-email_tester <- 'participant_27@some.email'
+email_tester <- c('participant_27@some.email', 'tester_2@some.email')
 
 
 ## . reports titles -----------------------------------------------
