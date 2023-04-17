@@ -29,14 +29,3 @@ block_pour_docx(docx_to_get)
 <br> 
 
 <!---BLOCK_TOC--->
-
-\newpage
-
-# `r {heading_list_tables}` 
-<br> 
-
-```{r}
-block_toc(style = "Table Caption")
-```
-
-
