@@ -11,8 +11,7 @@
 ## some of the statements of round 2 have been refined in dft3, so are not kept in executive summary
 ## update this line after round 2 is finished
 
-statement_numbers_in_dft2_to_keep_for_execsummary <- ""
-# c(4, 11, 18)
+statement_numbers_in_dft2_to_keep_for_execsummary <- c(4, 11, 18)
 
 
 
@@ -220,7 +219,7 @@ type1_zz_combined_round_2_3[statement_number == 10, .(var_label, var_label_exec_
 
 type1_zz_combined_round_2_3[type == 'text', var_label_exec_summary := section_txt]
 
-## replace NULL by NA for the plot cols ----
+## . and we replace NULL by NA to avoid errors in the plot cols ----
 type1_zz_combined_round_2_3[, names(type1_zz_combined_round_2_3) := lapply(.SD, function(x) replace(x, x=='NULL', ''))]
 
 
