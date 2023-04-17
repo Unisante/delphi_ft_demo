@@ -76,7 +76,8 @@ dft2_metadata[, variable_label := clean_variable_label(variable_label, thankyou_
 
 
 ## .. chk1 ----
-chk1 <- dft2_metadata[, .(field_name, variable_label, field_label)] 
+chk1 <- 
+  dft2_metadata[, .(field_name, variable_label, field_label)] 
 
 ## 3. Rename variables ----
 ## Sometimes there are errors in the naming of variables with the wrong section
@@ -101,7 +102,7 @@ pattern_colname_new <- '_z'
 dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(pattern_colname_old)] # ok
 
 
-## update the names
+## update the names (defined in 00_functions.R)
 update_statement_name(
   dt = dft2_data_redcapr_raw,
   metadata = dft2_metadata,
@@ -284,12 +285,14 @@ for (i in 1:nrow(choices_type3)) {
 dft2_lookup_type3 <- data.table::rbindlist(dft2_lookup_type3)
 
 ## 5.b dft2_lookup_initial ----
-dft2_lookup_initial <- dft2_metadata[!is.na(variable_label), .(variable = field_name, variable_label)]
+dft2_lookup_initial <- 
+  dft2_metadata[!is.na(variable_label), .(variable = field_name, variable_label)]
 
 
 ## 5.c dft2_lookup_final ----
-dft2_lookup_final <- rbindlist(list(dft2_lookup_initial,
-                               dft2_lookup_type3[, .(variable, variable_label)]))
+dft2_lookup_final <- 
+  rbindlist(list(dft2_lookup_initial,
+                 dft2_lookup_type3[, .(variable, variable_label)]))
 
 dft2_lookup_final[, variable_label := clean_variable_label(variable_label, thankyou_string)]
 
@@ -558,7 +561,8 @@ if (dft2_dt_type1_m[item > max_scale_delphi, .N] > 0) {
 OuhscMunge::verify_value_headstart(dft2_data_clean)
 
 
-### 9. save plots for use in executive summary ----
+### 9. save plots ----
+### some will be used in executive summary
 pacman::p_load(tidyverse, ggplot2, flextable, patchwork)
 
 ## .. summarise data_set ----
