@@ -37,4 +37,4 @@ Please go through the [Fast-track Delphi: user guide](https://github.com/Unisant
 
 ![CC BY-NC-SA 4.0](https://licensebuttons.net/l/by-nc-sa/4.0/88x31.png){fig-align="left"}
 
-Citation: Duperrex O and Velarde Crézé C. Fast-track Delphi: code with demo data and results. 2023. Département Promotion de la santé et préventions, Unisanté, Lausanne, Suisse. Available from: [https://github.com/Unisante/](Available from: https://github.com/Unisante/)
+Citation: Duperrex O and Velarde Crézé C. Fast-track Delphi: code with demo data and results. 2023. Département Promotion de la santé et préventions, Unisanté, Lausanne, Suisse. Available from: [https://github.com/Unisante/](https://github.com/Unisante/)
