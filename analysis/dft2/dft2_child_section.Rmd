@@ -117,9 +117,10 @@ if (length(selected_cols) > 0) {
       extract_statement_number(selected_variable)
     
     ## create the level 3 title
-    cat(paste("\n###", "Statement ", selected_statement_number),
+    # cat(paste("\n###", statement_txt, "Statement ", selected_statement_number),
+    #     "\n")
+    cat(glue::glue("\n### {statement_txt} {selected_statement_number}"),
         "\n")
-    
     ## create table with results and print as rmd
     if (report_type == 'repgen') {
       source(
@@ -181,7 +182,7 @@ if (length(selected_cols > 0)) {
     selected_variable <- i
     selected_statement_number <-
       extract_statement_number(selected_variable)
-    cat(paste("\n###", "Statement ", selected_statement_number),
+        cat(glue::glue("\n### {statement_txt} {selected_statement_number}"),
         "\n")
     
     ## create table with results and print as rmd
