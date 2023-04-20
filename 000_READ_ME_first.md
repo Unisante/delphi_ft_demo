@@ -30,6 +30,11 @@ In order to produce results in a very short time frame, we use an [R project](ht
 Please go through the [Fast-track Delphi: user guide](https://github.com/Unisante/delphi-fast-track-user-guide) to discover the steps with demo data, see what it produces and then try it out.
 
 
+## Authors - link to orcid page
+
+- [Olivier Duperrex](https://orcid.org/0000-0002-0932-6846)
+- [Camille Velarde Crézé](https://orcid.org/0000-0002-4686-9401)
+
 
 ## Licence
 
