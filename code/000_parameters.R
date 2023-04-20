@@ -67,7 +67,7 @@ heading_questions_type1 <- "Questions de type 1"
 heading_questions_type2 <- "Questions de type 2"
 heading_questions_type3 <- "Questions de type 3"
 
-heading_comment_section <- "Commentaires sur la section"
+heading_comment_section <- "Commentaires sur "
 
 email_recipient_text <- "Destinataire de ce rapport : " # used in individual reports
 
