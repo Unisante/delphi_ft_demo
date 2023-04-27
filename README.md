@@ -1,6 +1,8 @@
----
-title: "Fast-track Delphi: code with demo data and results"
----
+# Fast-track Delphi: code with demo data and results
+
+Olivier Duperrex <a href="https://orcid.org/0000-0002-0932-6846"><img alt="ORCID logo" src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png" width="16" height="16" /></a>, 
+Camille Velarde Crézé <a href=" https://orcid.org/0000-0002-4686-9401"><img alt="ORCID logo" src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png" width="16" height="16" /></a>,
+Unisanté, Lausanne
 
 ## Purpose
 
@@ -17,19 +19,6 @@ This document is part of a toolkit:
 -   User guide [![](https://img.shields.io/badge/doi-10.16909/dataset/39-blue.svg)](https://doi.org/10.16909/dataset/39)
 
 Please go through the [Fast-track Delphi: user guide](https://github.com/Unisante/delphi-fast-track-user-guide) to discover the steps with demo data, see what it produces and then try it out.
-
-
-## Authors
-
-- Olivier Duperrex <a href="https://orcid.org/0000-0002-0932-6846">
-<img alt="ORCID logo" src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png" width="16" height="16" />
-</a>
-
-
-- Camille Velarde Crézé <a href=" https://orcid.org/0000-0002-4686-9401">
-<img alt="ORCID logo" src="https://info.orcid.org/wp-content/uploads/2019/11/orcid_16x16.png" width="16" height="16" />
-</a>
-
 
 
 ## Citation
