@@ -1,0 +1,15 @@
+## token_delphi_ft_this_project.R.example
+## this is an example of file for the token to your project
+
+
+## 1. save this file with the name : 'token_delphi_ft_this_project.R'
+
+## 2. Replace 
+## . 'your_institution' by your institution name, 
+## . 'your_project' by a short project name
+
+## 3. Update in the lines below XXX, YYY and ZZZ with your details from the ‘API’ Menu in REDCap 
+
+redcap_uri <- "<https://XXXXXXXXX/api/>" 
+token_dft2 <- "YYYYYYYYYYYYYYYY"
+token_dft3 <- "ZZZZZZZZZZZZZZZZ"
