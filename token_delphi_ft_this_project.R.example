@@ -1,6 +1,6 @@
 ## token_delphi_ft_this_project.R.example
 ## olivier.duperrex@unisante.ch
-## 2023-05-08
+## 2023-06-30
 
 ## This is an example file for the tokens to your project
 
@@ -10,7 +10,7 @@
 
 ## 2. Update the lines below with your details from the ‘API’ Menu in REDCap 
 
-redcap_uri <- "<https://XXXXXXXXX/api/>" 
+redcap_uri <- "https://XXXXXXXXX/api/" 
 token_dft2 <- "YYYYYYYYYYYYYYYY"
 token_dft3 <- "ZZZZZZZZZZZZZZZZ"
 
@@ -18,5 +18,5 @@ token_dft3 <- "ZZZZZZZZZZZZZZZZ"
 
 
 ## Note
-. 'token_delphi_ft_this_project.R' has been added to .gitgnore to avoid transmitting the data to a git depot
-. if you use other means to share your work, alway delete the files containing your details to login into your redcap server
+## . 'token_delphi_ft_this_project.R' has been added to .gitgnore to avoid transmitting the data to a git depot
+## . if you use other means to share your work, alway delete the files containing your details to login into your redcap server
