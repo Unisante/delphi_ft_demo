@@ -255,175 +255,191 @@ dft2_type1_zz0_no_opinion
 ### check list of cols type2
 cols_type2
 
-### 4.0 dft2_type2_zz0 ----
-## create an empty table with all possible answers
-dft2_type2_zz0 <-
-  dft2_lookup_value_labels_final[field_name %in% cols_type2, .(variable = field_name, item = id_value_labels, value_labels)]
-
-
-### 4.1. dft2_dt_type2 -----------------------------------------------------
-dft2_dt_type2 <- dft2_data_clean[, lapply(.SD, sjlabelled::as_label), .SDcols = c('record_id', cols_type2)]
-head(dft2_dt_type2)
-
-
-### 4.2 dft2_dt_type2_m : melted table by record id ----------------------
-dft2_dt_type2_m <- dft2_dt_type2 %>%
-  melt('record_id', value.name = "item", na.rm = T) %>%
-  sjlabelled::remove_label()
-
-dft2_dt_type2_m
-
-dft2_dt_type2_m[, item := clean_variable_label(item, thankyou_string)]
-
-### 4.3 dft2_type2_counts ----
-dft2_type2_counts <-
-  dft2_dt_type2_m[, .N, keyby = .(variable, item)]
-dft2_type2_counts[, item := as.numeric(item)]
-names(dft2_type2_counts)
-str(dft2_type2_counts)
-
-### 4.4 dft2_type2_zz1 ------------------------------------------------------
-str(dft2_type2_zz0)
-
-dft2_type2_zz1 <- dft2_type2_zz0[dft2_type2_counts, on = .(variable,
-                                                           item),
-                       n := N]
-str(dft2_type2_zz1)
-
-### . replace NA by 0 ----
-dft2_type2_zz1[is.na(n), n := 0]
-
-### 4.5 add section and variable ----
-## extract_section and others are defined in 00_functions.R
-dft2_type2_zz1[, `:=`(
-  section = extract_section(variable),
-  type = extract_type(variable),
-  statement_number = extract_statement_number(variable)
-)] %>%
-  setcolorder(c('section', 'type', 'statement_number', 'variable', 'item'))
-
-dft2_type2_zz1[, prop := formattable::percent( n / total_participants, 1 ), keyby = variable]
-dft2_type2_zz1[, minibar := prop] # add a column for later plot
-
-dft2_type2_zz1[prop >= agreement_threshold_type2_3, agreement :="ok"]
-
-dft2_type2_zz1[agreement == "ok", agreement_icon := icon_ok] # icon_ok is for tick sign or ok sign
-
-
-### 4.6 add variable_label as a column ----
-dft2_type2_zz1[dft2_lookup_final, on = .(variable), variable_label := variable_label]
-
-
-
-### 4.7 order rows according to results ----
-## this will sort the table by ... and keep no opinion and other at the end
-names(dft2_type2_zz1)
-
-## this worked at one point in the development ...
-# dft2_type2_zz1 <- dft2_type2_zz1[order(variable, 
-#                                        value_labels %like% no_op_short,
-#                                        value_labels %like% other_please_short,
-#                                        -prop)]
-
-## ... but this is what is working correctly now 
-dft2_type2_zz1 <- dft2_type2_zz1[order(
-  variable,                                ## ... variable name
-  value_labels %like% no_op_short,         ## ... no opinion: no then yes
-  value_labels %like% other_please_short,  ## ... other : no then yes
-  -prop                                    ## ... decreasing proportion
-)]
-
-dft2_type2_zz1[, item := as.numeric(item)]
-
+if (length(cols_type2) > 0) {
+  ### 4.0 dft2_type2_zz0 ----
+  ## create an empty table with all possible answers
+  dft2_type2_zz0 <-
+    dft2_lookup_value_labels_final[field_name %in% cols_type2, .(variable = field_name, item = id_value_labels, value_labels)]
+  
+  
+  ### 4.1. dft2_dt_type2 -----------------------------------------------------
+  dft2_dt_type2 <-
+    dft2_data_clean[, lapply(.SD, sjlabelled::as_label), .SDcols = c('record_id', cols_type2)]
+  head(dft2_dt_type2)
+  
+  
+  ### 4.2 dft2_dt_type2_m : melted table by record id ----------------------
+  dft2_dt_type2_m <- dft2_dt_type2 %>%
+    melt('record_id', value.name = "item", na.rm = T) %>%
+    sjlabelled::remove_label()
+  
+  dft2_dt_type2_m
+  
+  dft2_dt_type2_m[, item := clean_variable_label(item, thankyou_string)]
+  
+  ### 4.3 dft2_type2_counts ----
+  dft2_type2_counts <-
+    dft2_dt_type2_m[, .N, keyby = .(variable, item)]
+  dft2_type2_counts[, item := as.numeric(item)]
+  names(dft2_type2_counts)
+  str(dft2_type2_counts)
+  
+  ### 4.4 dft2_type2_zz1 ------------------------------------------------------
+  str(dft2_type2_zz0)
+  
+  dft2_type2_zz1 <- dft2_type2_zz0[dft2_type2_counts, on = .(variable,
+                                                             item),
+                                   n := N]
+  str(dft2_type2_zz1)
+  
+  ### . replace NA by 0 ----
+  dft2_type2_zz1[is.na(n), n := 0]
+  
+  ### 4.5 add section and variable ----
+  ## extract_section and others are defined in 00_functions.R
+  dft2_type2_zz1[, `:=`(
+    section = extract_section(variable),
+    type = extract_type(variable),
+    statement_number = extract_statement_number(variable)
+  )] %>%
+    setcolorder(c('section', 'type', 'statement_number', 'variable', 'item'))
+  
+  dft2_type2_zz1[, prop := formattable::percent(n / total_participants, 1), keyby = variable]
+  dft2_type2_zz1[, minibar := prop] # add a column for later plot
+  
+  dft2_type2_zz1[prop >= agreement_threshold_type2_3, agreement := "ok"]
+  
+  dft2_type2_zz1[agreement == "ok", agreement_icon := icon_ok] # icon_ok is for tick sign or ok sign
+  
+  
+  ### 4.6 add variable_label as a column ----
+  dft2_type2_zz1[dft2_lookup_final, on = .(variable), variable_label := variable_label]
+  
+  
+  
+  ### 4.7 order rows according to results ----
+  ## this will sort the table by ... and keep no opinion and other at the end
+  names(dft2_type2_zz1)
+  
+  ## this worked at one point in the development ...
+  # dft2_type2_zz1 <- dft2_type2_zz1[order(variable,
+  #                                        value_labels %like% no_op_short,
+  #                                        value_labels %like% other_please_short,
+  #                                        -prop)]
+  
+  ## ... but this is what is working correctly now
+  dft2_type2_zz1 <- dft2_type2_zz1[order(
+    variable,
+    ## ... variable name
+    value_labels %like% no_op_short,
+    ## ... no opinion: no then yes
+    value_labels %like% other_please_short,
+    ## ... other : no then yes-prop                                    ## ... decreasing proportion
+  )]
+  
+  dft2_type2_zz1[, item := as.numeric(item)]
+}
 ## . ----
 ## 5. > cols_type3 --------------------------------------------------
 ### here we need to add no_opinion with a rbindlist as it is a separate variable for each question
-
-
-cols_type3_in_dft2_data_clean <- dft2_data_clean[, names(.SD), .SDcols = patterns('_type3___')]
-cols_type3_in_dft2_data_clean
-
-### 5.1 cols_type3_no_opinion ----
-cols_type3_no_opinion <- dft2_data_clean[, names(.SD), .SDcols = patterns('_type3_no_op')]
-cols_type3_no_opinion
-
-
-### 5.2 dft2_type3_zz0 ------------------------------------------------------
-dft2_type3_zz0 <- dft2_data_clean[, .(
-  item_name = names(.SD), 
-  item = lapply(.SD, sjlabelled::get_label),
-  n = lapply(.SD, sum)
-), .SDcols = cols_type3_in_dft2_data_clean]
-
-## extract variable from item_name
-dft2_type3_zz0[, variable := stringr::word(item_name, 1, sep = stringr::fixed("__"))]
-
-### 5.3 dft2_type3_zz0_no_opinion -------------------------------------------
-
-dft2_type3_zz0_no_opinion <- dft2_data_clean[, .(
-  item_name = names(.SD), 
-  item = no_op_short,
-  n = lapply(.SD, function(x) {sum(!is.na(x))})
-), .SDcols = c(cols_type3_no_opinion)]
-2
-dft2_type3_zz0_no_opinion[, n := as.numeric(n)]
-dft2_type3_zz0_no_opinion[, variable := stringr::word(item_name, 1, sep = stringr::fixed("_no_op"))]
-
-### 5.4 dft2_type3_zz1 ------------------------------------------------------
-dft2_type3_zz1 <- rbindlist(list(dft2_type3_zz0, dft2_type3_zz0_no_opinion))
-
-
-
-### 5.5 add section and variable ----
-## extract_section is defined in 00_functions
-## section = stringr::str_extract(item, '(?<=\\_)(.*?)(?=\\_)') %>% toupper(),
-dft2_type3_zz1[, `:=`(
-  n = as.numeric(n),
-  item = as.character(item),
-  section = extract_section(item_name),
-  type = extract_type(variable),
-  statement_number = extract_statement_number(variable)
-)] %>%
-  setcolorder(c('section', 'type', 'statement_number', 'variable', 'item_name'))
-
-
-
-dft2_type3_zz1[, prop := formattable::percent( n / total_participants, 1), keyby = variable]
-dft2_type3_zz1[, minibar := prop]
-# dft2_type3_zz1
-
-dft2_type3_zz1[prop >= agreement_threshold_type2_3, agreement :="ok"]
-
-dft2_type3_zz1[agreement == "ok", agreement_icon := icon_ok] # icon_ok is for tick sign or ok sign
-
-
-
-
-### 5.6 rename item for tables --------------------------------------------------
-setnames(dft2_type3_zz1, 'item','value_labels')
-
-
-### 5.7 order rows according to results ----
-### this will sort the table by ... and keep no opinion and other at the end
-
-## this worked at one point in the development ...
-# dft2_type3_zz1 <- dft2_type3_zz1[order(
-#   variable,                               ## ... variable name
-#   -prop,                                  ## ... decreasing proportion
-#   value_labels %like% no_op_short,        ## ... no opinion: no then yes
-#   value_labels %like% other_please_short  ## ... other : no then yes
-#   )]
-
-## ... but this is what is working correctly now 
-dft2_type3_zz1 <- dft2_type3_zz1[order(
-  variable,                                ## ... variable name
-  value_labels %like% no_op_short,         ## ... no opinion: no then yes
-  value_labels %like% other_please_short,  ## ... other : no then yes
-  -prop                                    ## ... decreasing proportion
-)]
-
-
-
+if (length(cols_type3) > 0) {
+  cols_type3_in_dft2_data_clean <-
+    dft2_data_clean[, names(.SD), .SDcols = patterns('_type3___')]
+  cols_type3_in_dft2_data_clean
+  
+  ### 5.1 cols_type3_no_opinion ----
+  cols_type3_no_opinion <-
+    dft2_data_clean[, names(.SD), .SDcols = patterns('_type3_no_op')]
+  cols_type3_no_opinion
+  
+  
+  ### 5.2 dft2_type3_zz0 ------------------------------------------------------
+  dft2_type3_zz0 <- dft2_data_clean[, .(
+    item_name = names(.SD),
+    item = lapply(.SD, sjlabelled::get_label),
+    n = lapply(.SD, sum)
+  ), .SDcols = cols_type3_in_dft2_data_clean]
+  
+  ## extract variable from item_name
+  dft2_type3_zz0[, variable := stringr::word(item_name, 1, sep = stringr::fixed("__"))]
+  
+  ### 5.3 dft2_type3_zz0_no_opinion -------------------------------------------
+  
+  dft2_type3_zz0_no_opinion <- dft2_data_clean[, .(
+    item_name = names(.SD),
+    item = no_op_short,
+    n = lapply(.SD, function(x) {
+      sum(!is.na(x))
+    })
+  ), .SDcols = c(cols_type3_no_opinion)]
+  2
+  dft2_type3_zz0_no_opinion[, n := as.numeric(n)]
+  dft2_type3_zz0_no_opinion[, variable := stringr::word(item_name, 1, sep = stringr::fixed("_no_op"))]
+  
+  ### 5.4 dft2_type3_zz1 ------------------------------------------------------
+  dft2_type3_zz1 <-
+    rbindlist(list(dft2_type3_zz0, dft2_type3_zz0_no_opinion))
+  
+  
+  
+  ### 5.5 add section and variable ----
+  ## extract_section is defined in 00_functions
+  ## section = stringr::str_extract(item, '(?<=\\_)(.*?)(?=\\_)') %>% toupper(),
+  dft2_type3_zz1[, `:=`(
+    n = as.numeric(n),
+    item = as.character(item),
+    section = extract_section(item_name),
+    type = extract_type(variable),
+    statement_number = extract_statement_number(variable)
+  )] %>%
+    setcolorder(c(
+      'section',
+      'type',
+      'statement_number',
+      'variable',
+      'item_name'
+    ))
+  
+  
+  
+  dft2_type3_zz1[, prop := formattable::percent(n / total_participants, 1), keyby = variable]
+  dft2_type3_zz1[, minibar := prop]
+  # dft2_type3_zz1
+  
+  dft2_type3_zz1[prop >= agreement_threshold_type2_3, agreement := "ok"]
+  
+  dft2_type3_zz1[agreement == "ok", agreement_icon := icon_ok] # icon_ok is for tick sign or ok sign
+  
+  
+  
+  
+  ### 5.6 rename item for tables --------------------------------------------------
+  setnames(dft2_type3_zz1, 'item', 'value_labels')
+  
+  
+  ### 5.7 order rows according to results ----
+  ### this will sort the table by ... and keep no opinion and other at the end
+  
+  ## this worked at one point in the development ...
+  # dft2_type3_zz1 <- dft2_type3_zz1[order(
+  #   variable,                               ## ... variable name
+  #   -prop,                                  ## ... decreasing proportion
+  #   value_labels %like% no_op_short,        ## ... no opinion: no then yes
+  #   value_labels %like% other_please_short  ## ... other : no then yes
+  #   )]
+  
+  ## ... but this is what is working correctly now
+  dft2_type3_zz1 <- dft2_type3_zz1[order(
+    variable,
+    ## ... variable name
+    value_labels %like% no_op_short,
+    ## ... no opinion: no then yes
+    value_labels %like% other_please_short,
+    ## ... other : no then yes-prop                                    ## ... decreasing proportion
+  )]
+  
+  
+}
 
 ## . ----
 ## 6. > dft2_dt_comments_m ----
@@ -450,20 +466,41 @@ dft2_dt_comments_m[, statement_number:= extract_statement_number(variable)]
 ## . ----
 ## 7.1 save RData -------------------------------------------------------------
 
-save(dft2_type0_zz1, file = here::here('output', 'RData', 'dft2_type0_zz1.RData'))
 
-save(dft2_type1_zz_combined, file = here::here('output', 'RData', 'dft2_type1_zz_combined.RData'))
+save(dft2_type0_zz1,
+     file = here::here('output', 'RData', 'dft2_type0_zz1.RData'))
 
-save(dft2_type2_zz1, file = here::here('output', 'RData', 'dft2_type2_zz1.RData'))
+save(
+  dft2_type1_zz_combined,
+  file = here::here('output', 'RData', 'dft2_type1_zz_combined.RData')
+)
 
-save(dft2_type3_zz1, file = here::here('output', 'RData', 'dft2_type3_zz1.RData'))
 
-save(dft2_dt_comments_m, file = here::here('output', 'RData', 'dft2_dt_comments_m.RData'))
+if (length(cols_type2) > 0) {
+  save(dft2_type2_zz1,
+       file = here::here('output', 'RData', 'dft2_type2_zz1.RData'))
+}
+
+if (length(cols_type3) > 0) {
+  save(dft2_type3_zz1,
+       file = here::here('output', 'RData', 'dft2_type3_zz1.RData'))
+}
+
+save(dft2_dt_comments_m,
+     file = here::here('output', 'RData', 'dft2_dt_comments_m.RData'))
 
 
 
 ## 7.2 save to xlsx ----
-writexl::write_xlsx(dft2_type1_zz0_no_opinion, path = here::here('output', 'checks', 'dft2_type1_zz0_no_opinion.xlsx'))
-writexl::write_xlsx(dft2_type3_zz0_no_opinion, path = here::here('output', 'checks', 'dft2_type3_zz0_no_opinion.xlsx'))
+writexl::write_xlsx(
+  dft2_type1_zz0_no_opinion,
+  path = here::here('output', 'checks', 'dft2_type1_zz0_no_opinion.xlsx')
+)
 
+if (length(cols_type3) > 0) {
+  writexl::write_xlsx(
+    dft2_type3_zz0_no_opinion,
+    path = here::here('output', 'checks', 'dft2_type3_zz0_no_opinion.xlsx')
+  )
+}
 

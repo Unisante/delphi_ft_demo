@@ -95,97 +95,97 @@ chk1 <-
 ## all variables with _0b_ should have named with _z_
 ## here we correct this by code, in dft2_data_redcapr_raw and in dft2_metadata
 
-pattern_colname_old <- '_0b'
-pattern_colname_new <- '_z'
-
-## check the names to update
-dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(pattern_colname_old)] # ok
-
-
-## update the names (defined in 00_functions.R)
-update_statement_name(
-  dt = dft2_data_redcapr_raw,
-  metadata = dft2_metadata,
-  pattern_colname_old,
-  pattern_colname_new
-)
-
-## check update worked
+# pattern_colname_old <- '_0b'
+# pattern_colname_new <- '_z'
+# 
+# ## check the names to update
 # dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(pattern_colname_old)] # ok
-dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(pattern_colname_new)] # ok
-
-dft2_metadata[field_name %like% pattern_colname_old, .(field_name)] # empty
-dft2_metadata[field_name %like% pattern_colname_new, .(field_name)] # ok
-
-## .. rename two variables that are in 0b but had _a_ by mistake ------
-
-## ... dft2_a_s2 -> dft2_z_s2 ----
-statement_to_update <- '_s2_'
-
-pattern_colname_old <- paste0('_a', statement_to_update)
-pattern_colname_new <- paste0('_z', statement_to_update)
-
-## check the names to update
-dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(statement_to_update)] # ok
-
-## update the names
-update_statement_name(
-  dt = dft2_data_redcapr_raw,
-  metadata = dft2_metadata,
-  pattern_colname_old,
-  pattern_colname_new
-)
-
-## check update worked
-dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(statement_to_update)] # ok
-
-dft2_metadata[field_name %like% statement_to_update, .(field_name)]
-
-## ... dft2_a_s3 -> dft2_0z_s3 ----
-statement_to_update <- '_s3_'
-
-pattern_colname_old <- paste0('_a', statement_to_update)
-pattern_colname_new <- paste0('_z', statement_to_update)
-
-update_statement_name(
-  dt = dft2_data_redcapr_raw,
-  metadata = dft2_metadata,
-  pattern_colname_old,
-  pattern_colname_new
-)
-
-dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(statement_to_update)] # ok
+# 
+# 
+# ## update the names (defined in 00_functions.R)
+# update_statement_name(
+#   dt = dft2_data_redcapr_raw,
+#   metadata = dft2_metadata,
+#   pattern_colname_old,
+#   pattern_colname_new
+# )
+# 
+# ## check update worked
+# # dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(pattern_colname_old)] # ok
+# dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(pattern_colname_new)] # ok
+# 
+# dft2_metadata[field_name %like% pattern_colname_old, .(field_name)] # empty
+# dft2_metadata[field_name %like% pattern_colname_new, .(field_name)] # ok
+# 
+# ## .. rename two variables that are in 0b but had _a_ by mistake ------
+# 
+# ## ... dft2_a_s2 -> dft2_z_s2 ----
+# statement_to_update <- '_s2_'
+# 
+# pattern_colname_old <- paste0('_a', statement_to_update)
+# pattern_colname_new <- paste0('_z', statement_to_update)
+# 
+# ## check the names to update
+# dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(statement_to_update)] # ok
+# 
+# ## update the names
+# update_statement_name(
+#   dt = dft2_data_redcapr_raw,
+#   metadata = dft2_metadata,
+#   pattern_colname_old,
+#   pattern_colname_new
+# )
+# 
+# ## check update worked
+# dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(statement_to_update)] # ok
+# 
+# dft2_metadata[field_name %like% statement_to_update, .(field_name)]
+# 
+# ## ... dft2_a_s3 -> dft2_0z_s3 ----
+# statement_to_update <- '_s3_'
+# 
+# pattern_colname_old <- paste0('_a', statement_to_update)
+# pattern_colname_new <- paste0('_z', statement_to_update)
+# 
+# update_statement_name(
+#   dt = dft2_data_redcapr_raw,
+#   metadata = dft2_metadata,
+#   pattern_colname_old,
+#   pattern_colname_new
+# )
+# 
+# dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(statement_to_update)] # ok
 
 
 ## .. rename variables 'comment_bis' ---------------------------------
 ## patterns ---
-pattern_colname_old <- '_comment_bis'
-pattern_colname_new <- '_comment'
-
-cols_comments_bis <- dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(pattern_colname_old)]
-cols_comments_bis
-
-cols_comments_to_rename <- cols_comments_bis %>% stringr::str_replace_all(pattern_colname_old, pattern_colname_new)
-cols_comments_to_rename
-
-## ... rename in dft2_data_redcapr_raw ---
-dft2_data_redcapr_raw %>% setnames(cols_comments_bis, cols_comments_to_rename)
-
-## check---
-dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(pattern_colname_new)]
-
-
-## ... rename in dft2_metadata ---
-## check names old exists
-dft2_metadata[field_name %like% pattern_colname_old, ]
-
-
-
-dft2_metadata[field_name %like% pattern_colname_old,
-         field_name := stringr::str_replace_all(field_name, pattern_colname_old, pattern_colname_new)]
-
-## check ---
-dft2_metadata[field_name %like% pattern_colname_new, field_name]
+# pattern_colname_old <- '_comment_bis'
+# pattern_colname_new <- '_comment'
+# 
+# cols_comments_bis <- dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(pattern_colname_old)]
+# cols_comments_bis
+# 
+# cols_comments_to_rename <- cols_comments_bis %>% stringr::str_replace_all(pattern_colname_old, pattern_colname_new)
+# cols_comments_to_rename
+# 
+# ## ... rename in dft2_data_redcapr_raw --- 
+# dft2_data_redcapr_raw %>% setnames(cols_comments_bis, cols_comments_to_rename)
+# 
+# ## check---
+# dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(pattern_colname_new)]
+# 
+# 
+# ## ... rename in dft2_metadata ---
+# ## check names old exists
+# dft2_metadata[field_name %like% pattern_colname_old, ]
+# 
+# 
+# 
+# dft2_metadata[field_name %like% pattern_colname_old, 
+#          field_name := stringr::str_replace_all(field_name, pattern_colname_old, pattern_colname_new)]
+# 
+# ## check ---
+# dft2_metadata[field_name %like% pattern_colname_new, field_name]
 
 
 
@@ -200,19 +200,23 @@ cols_0_subset <- c('dft2_0_gender', 'dft2_0_job', 'dft2_0_joblang')
 cols_0_subset
 
 ## .. cols_type1 ----
+# cols <- grep("_type2$", names(dft2_data_redcapr_raw), value = TRUE)
+
 cols_type1 <- dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns('_type1$')]
 cols_type1
-class(dft2_data_redcapr_raw$dft2_z_s1_type1)
+# class(dft2_data_redcapr_raw$dft2_z_s1_type1)
 
 ## .. cols_type2 ----
-cols_type2 <- dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns('_type2$')]
+cols_type2 <- grep("_type2$", names(dft2_data_redcapr_raw), value = TRUE)
+  # dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns('_type2$')]
 cols_type2
-class(dft2_data_redcapr_raw$dft2_a_s10_type2)
+# class(dft2_data_redcapr_raw$dft2_a_s10_type2)
 
 ## .. cols_type3 ----
-cols_type3 <- dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns('_type3___')]
+cols_type3 <- grep("_type3___", names(dft2_data_redcapr_raw), value = TRUE)
+  # dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns('_type3___')]
 cols_type3
-class(dft2_data_redcapr_raw$dft2_z_s2_type3___1)
+# class(dft2_data_redcapr_raw$dft2_z_s2_type3___1)
 
 
 
@@ -235,64 +239,70 @@ list_vars_with_value_labels
 ## dft2_metadata : one variable name and one select_choices_or_calculations 
 ## data : several variables which names is xxx_type3___# (one binary for each possible response)
 
-
-## .. list_type3_unique ----
-## create list with unique name of variable (as it will be in dft2_metadata)
-list_type3_unique <-
-  cols_type3 %>%
-  stringr::word(1, sep = '\\___') %>%
-  unique()
-
-## .. choices_type3 ----
-## extract choices for type3 from dft2_metadata ---
-choices_type3 <- dft2_metadata[field_name %in% list_type3_unique, .(field_name, select_choices_or_calculations)]
-choices_type3
-
-## >> SOLUTION : create empty list - for loop to add 'nested' tables - and use rbindlist to 'unnest' ---
-## thanks to : https://stackoverflow.com/a/29419402/6176250
-
-## .. dft2_lookup_type3 ----
-## create an empty lists
-dft2_lookup_type3 <- list()
-# i = 2
-
-
-## .. for loop to add 'nested' tables ----
-for (i in 1:nrow(choices_type3)) {
+## condition added in case there is no cols_type3
+if (length(cols_type3) > 0) {
+  ## .. list_type3_unique ----
+  ## create list with unique name of variable (as it will be in dft2_metadata)
+  list_type3_unique <-
+    cols_type3 %>%
+    stringr::word(1, sep = '\\___') %>%
+    unique()
   
-  # create temporary table
-  dft2_lookup_0 <-
-    REDCapR::regex_named_captures(pattern = pattern_boxes_fr,
-                                  text = choices_type3$select_choices_or_calculations[i]) %>% 
-    setDT()
+  ## .. choices_type3 ----
+  ## extract choices for type3 from dft2_metadata ---
+  choices_type3 <-
+    dft2_metadata[field_name %in% list_type3_unique, .(field_name, select_choices_or_calculations)]
+  choices_type3
   
-  # keep field_name
-  dft2_lookup_0[, field_name :=  choices_type3$field_name[[i]]]                      
+  ## >> SOLUTION : create empty list - for loop to add 'nested' tables - and use rbindlist to 'unnest' ---
+  ## thanks to : https://stackoverflow.com/a/29419402/6176250
   
-  # add variable name and label
-  dft2_lookup_0[, variable := paste0(field_name,'___', id)] %>%
-    setcolorder('variable')
+  ## .. dft2_lookup_type3 ----
+  ## create an empty lists
+  dft2_lookup_type3 <- list()
+  # i = 2
   
-  # rename label
-  setnames(dft2_lookup_0, 'label', 'variable_label')
-
-  # add it to your list
-  dft2_lookup_type3[[i]] <- dft2_lookup_0 
   
+  ## .. for loop to add 'nested' tables ----
+  for (i in 1:nrow(choices_type3)) {
+    # create temporary table
+    dft2_lookup_0 <-
+      REDCapR::regex_named_captures(pattern = pattern_boxes_fr,
+                                    text = choices_type3$select_choices_or_calculations[i]) %>%
+      setDT()
+    
+    # keep field_name
+    dft2_lookup_0[, field_name :=  choices_type3$field_name[[i]]]
+    
+    # add variable name and label
+    dft2_lookup_0[, variable := paste0(field_name, '___', id)] %>%
+      setcolorder('variable')
+    
+    # rename label
+    setnames(dft2_lookup_0, 'label', 'variable_label')
+    
+    # add it to your list
+    dft2_lookup_type3[[i]] <- dft2_lookup_0
+    
+  }
+  
+  ## .. rbindlist to unnest ----
+  dft2_lookup_type3 <- data.table::rbindlist(dft2_lookup_type3)
 }
 
-## .. rbindlist to unnest ----
-dft2_lookup_type3 <- data.table::rbindlist(dft2_lookup_type3)
-
 ## 5.b dft2_lookup_initial ----
-dft2_lookup_initial <- 
+dft2_lookup_initial <-
   dft2_metadata[!is.na(variable_label), .(variable = field_name, variable_label)]
-
-
+  
+  
 ## 5.c dft2_lookup_final ----
-dft2_lookup_final <- 
-  rbindlist(list(dft2_lookup_initial,
-                 dft2_lookup_type3[, .(variable, variable_label)]))
+if (length(cols_type3) > 0) {
+  dft2_lookup_final <-
+    rbindlist(list(dft2_lookup_initial,
+                   dft2_lookup_type3[, .(variable, variable_label)]))
+} else {
+  dft2_lookup_final <- dft2_lookup_initial
+}
 
 dft2_lookup_final[, variable_label := clean_variable_label(variable_label, thankyou_string)]
 

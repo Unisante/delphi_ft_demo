@@ -109,6 +109,15 @@ save(dft2_metadata, file = here::here('data', 'redcap_data_raw', 'dft2_metadata.
 
 ## 3. checks --------------------------------------------------------
 
+cols_type2 <- grep("_type2$", names(dft2_data_redcapr_raw), value = TRUE)
+cols_type2
+
+
+## .. cols_type3 ----
+cols_type3 <- grep("_type3___", names(dft2_data_redcapr_raw), value = TRUE)
+cols_type3
+
+
 ## .. chk_type1_raw ----
 chk_type1_raw <-
   dft2_data_redcapr_raw[, .SD, .SDcols = patterns('_type1$'), keyby = record_id] %>%
@@ -123,21 +132,24 @@ chk_type1_raw %>%
 
 
 ## .. chk_type2_raw ----
-chk_type2_raw <-
-  dft2_data_redcapr_raw[, .SD, .SDcols = patterns('_type2$'), keyby = record_id] %>%
-  data.table::transpose(keep.names = 'variable')
-
-
-chk_type2_raw %>%
-  writexl::write_xlsx(path = here::here('output', 'checks', 'chk_dft2_type2_raw.xlsx'))
-
+if (length(cols_type2) > 0) {
+  chk_type2_raw <-
+    dft2_data_redcapr_raw[, .SD, .SDcols = patterns('_type2$'), keyby = record_id] %>%
+    data.table::transpose(keep.names = 'variable')
+  
+  
+  chk_type2_raw %>%
+    writexl::write_xlsx(path = here::here('output', 'checks', 'chk_dft2_type2_raw.xlsx'))
+}
 
 ## .. chk_type3_raw ----
-chk_type3_raw <-
+if (length(cols_type3) > 0) {
+  chk_type3_raw <-
   dft2_data_redcapr_raw[, .SD, .SDcols = patterns('_type3__'), keyby = record_id] %>%
   data.table::transpose(keep.names = 'variable')
 
 
 chk_type3_raw %>%
   writexl::write_xlsx(path = here::here('output', 'checks', 'chk_dft2_type3_raw.xlsx'))
+}
 
