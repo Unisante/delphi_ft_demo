@@ -107,10 +107,13 @@ list_files_2 <- tibble::tibble(
 )
 
 ## combine the two lists ----
-list_files <- rbind(list_files_1, list_files_2)
+list_files <- rbind(list_files_1, list_files_2) |> 
+  dplyr::mutate(keep = fs::file_exists(filename))
 
 ### .. purrr::walk the list to load the RData with ad hoc function ----
-list_files %>% purrr::walk2(.x = .$files_to_load, .y = .$filename, .f = ~ load_if_not_loaded(.x, .y))
+list_files  |> 
+  dplyr::filter(keep == TRUE) %>%
+  purrr::walk2(.x = .$files_to_load, .y = .$filename, .f = ~ load_if_not_loaded(.x, .y))
 
 ### . rename some elements used later ----
 ### not the cleanest but as objects are small it has no impact on performance
