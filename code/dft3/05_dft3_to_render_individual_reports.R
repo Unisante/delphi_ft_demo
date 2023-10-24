@@ -28,8 +28,12 @@ list_record_id <- dft3_data_clean[order(record_id)][, record_id]
 list_record_id
 
 ## dft3_report_per_participant.Rmd ------------------------------------------
-# list_record_id <- c(6,7)
+## uncomment one of the line below to test with a few
+## remember to comment it again when you are ready to create all the individual reports
 
+# list_record_id <- head(list_record_id, n = 4)
+# list_record_id <- tail(list_record_id, n = 10)
+# list_record_id
 
 list_record_id
 
