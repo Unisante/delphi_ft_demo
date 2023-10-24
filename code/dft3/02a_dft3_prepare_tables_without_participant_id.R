@@ -1,6 +1,6 @@
 ## 02a_dft3_prepare_tables_without_participant_id.R
 ## olivier.duperrex@unisante.ch
-## 2022-09-13
+## 2023-10-24
 
 ## this script will generate the tables and graphs without individual data
 ## in principle, only type 1
@@ -222,6 +222,25 @@ dft3_dt_comments_m <- dft3_dt_comments %>%
 ## add section and statement number ---
 dft3_dt_comments_m[, section := extract_section(variable)]
 dft3_dt_comments_m[, statement_number:= extract_statement_number(variable)]
+
+## add the response to the question being commented on ----
+dft3_dt_comments_m[ , variable_commented := stringr::str_replace_all(variable, "_comment", "")]
+
+
+dft3_dt_type1_m |> 
+  setnames(c('variable', 'item'),
+           c('variable_commented', 'response'))
+
+dft3_dt_type1_m[, variable_commented := stringr::str_replace_all(variable_commented, "_type1", "")]
+
+
+## left join ---
+dft3_dt_comments_m[dft3_dt_type1_m,
+                   on = .(record_id, variable_commented),
+                   response := response]
+
+dft3_dt_comments_m <- 
+  dft3_dt_comments_m[order(variable_commented, response)]
 
 
 ## . ----
