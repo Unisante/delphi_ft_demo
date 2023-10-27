@@ -5,9 +5,8 @@
 ## AIM : create lists of variables by type and section for more readabale code
 
 
-## cols_0_subset ----
-## check in 01a that there is no change
-cols_0_subset <- c('dft2_0_gender', 'dft2_0_job', 'dft2_0_joblang')
+## cols_0 and cols_0_subset_type3 ----
+## define in 000_parameters.R
 
 ## cols_type1 ----
 

@@ -1,6 +1,6 @@
 ## 000_parameters.R
 ## Prepared by olivier.duperrex@unisante.ch
-## Modified on 2023-10-25
+## Modified on 2023-10-27
 ## 
 ## Elements that can be modified according to the topic, the language,
 ## and desired adjustments on the output
@@ -224,6 +224,7 @@ label_execsummary_agree_consensus_yes     <- 'Accord consensuel atteint'
 label_execsummary_disagree_consensus_yes  <- 'Désaccord consensuel atteint'
 label_execsummary_consensus_no            <- 'Absence de consensus'
 
+label_response <- 'Réponse\n(1 à 9)' ## used in comments for questions type_1
 label_responses_participant_single <- 'Votre\nréponse'  ## '\n' creates a new line
 label_responses_participant_plural <- 'Vos\nréponses'   ## '\n' creates a new line
 

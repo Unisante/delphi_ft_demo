@@ -50,7 +50,7 @@ if (length(selected_cols) > 0) {
       here::here('code', '03a_create_flextable_results_type_1_generic.R'),
       encoding = 'UTF-8'
     )
-    flextable_to_rmd(ft_generic)
+    flextable::flextable_to_rmd(ft_generic)
   }
   
   if (report_type == 'per_participant') {
@@ -62,13 +62,13 @@ if (length(selected_cols) > 0) {
       encoding = 'UTF-8'
     )
     
-    flextable_to_rmd(ft_participant)
+    flextable::flextable_to_rmd(ft_participant)
   }
   
   # print two empty lines
   cat("\n  <br><br>  \n")
   
-  ## for loop for comments: create table with comments and print as rmd
+  ## for loop for comments: for each variable, create a separate table with comments and print as rmd
   
   for (i in 1:length(selected_cols)) {
     selected_statement_number <-
@@ -78,8 +78,8 @@ if (length(selected_cols) > 0) {
       lookup_final[variable == selected_comments[i], variable_label]
     
     dt_comments_m[statement_number == selected_statement_number,] %>%
-      create_flextable_comments_participant() %>%
-      flextable_to_rmd()
+      create_flextable_comments_participant_type1() %>%
+      flextable::flextable_to_rmd()
     
     # print two empty lines
     cat("\n  <br><br>  \n")
@@ -129,7 +129,7 @@ if (length(selected_cols) > 0) {
         encoding = 'UTF-8'
       )
       
-      flextable_to_rmd(ft_generic)
+      flextable::flextable_to_rmd(ft_generic)
     }
     
     if (report_type == 'per_participant') {
@@ -141,14 +141,15 @@ if (length(selected_cols) > 0) {
         encoding = 'UTF-8'
       )
       
-      flextable_to_rmd(ft_participant)
+      flextable::flextable_to_rmd(ft_participant)
       
     }
     # print two empty lines
     cat("\n  <br><br>  \n")
     
     ## create table with comments and print as rmd
-    flextable_to_rmd(ft_comments)
+    ## ft_comments is created by by 03b_ or 04b_
+    flextable::flextable_to_rmd(ft_comments)
     
     # print two empty lines and a page break
     cat("\n\n\\newpage\n")
@@ -193,7 +194,7 @@ if (length(selected_cols > 0)) {
         encoding = 'UTF-8'
       )
       
-      flextable_to_rmd(ft_generic)
+      flextable::flextable_to_rmd(ft_generic)
     }
     
     if (report_type == 'per_participant') {
@@ -205,14 +206,15 @@ if (length(selected_cols > 0)) {
         encoding = 'UTF-8'
       )
       
-      flextable_to_rmd(ft_participant)
+      flextable::flextable_to_rmd(ft_participant)
       
     }
     # print two empty lines
     cat("\n  <br><br>  \n")
     
     ## create table with comments and print as rmd
-    flextable_to_rmd(ft_comments)
+    ## ft_comments is created by by 03b_ or 04b_
+    flextable::flextable_to_rmd(ft_comments)
     
     # print two empty lines and a page break
     cat("\n\n\\newpage\n")
@@ -244,7 +246,8 @@ if (selected_section == 'Z') {
 
 
 
-dt_comments_m[variable == selected_section_comment] %>% create_flextable_comments_participant()
+dt_comments_m[variable == selected_section_comment] %>% 
+  create_flextable_comments_participant()
 
 ```
 

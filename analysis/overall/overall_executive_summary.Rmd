@@ -22,7 +22,6 @@ current_round <- "Executive"
 
 report_type <- "Summary"
 
-# list_sections <- list_sections_overall
 
 ## . local functions ----------------------------------------------
 source(here::here('code', '00_functions.R'), encoding = 'UTF-8')
@@ -30,6 +29,9 @@ source(here::here('code', '00_functions.R'), encoding = 'UTF-8')
 ## Title, subtitle and authors are defined in '00_parameters.R' which is sourced by '00_functions.R' so they can be added dynamically
 ## see https://bookdown.org/yihui/rmarkdown-cookbook/dynamic-yaml.html for more details
 ## 
+
+list_sections <- list_sections_overall
+list_labels_sections <- list_labels_sections_overall
 ```
 
 ---

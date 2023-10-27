@@ -2,6 +2,7 @@
 ## olivier.duperrex@unisante.ch
 ## 2022-06-24
 
+
 ## selected_table ----
 selected_table <- glue::glue('{current_round}_{selected_type}_zz_combined')
 

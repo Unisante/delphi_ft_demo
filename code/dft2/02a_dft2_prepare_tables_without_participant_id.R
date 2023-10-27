@@ -148,6 +148,7 @@ names(dft2_type0_3_zz0)
 dft2_type0_3_zz0[dft2_lookup_final,
                  on = 'variable', 
                  variable_label := variable_label]
+
 setcolorder(dft2_type0_3_zz0, 
             names(dft2_type0_value_labels_zz1))
 
@@ -385,24 +386,15 @@ if (length(cols_type2) > 0) {
   
   
   ### 4.7 order rows according to results ----
-  ## this will sort the table by ... and keep no opinion and other at the end
+  ## this will sort the table by variables and keep 'no opinion' and 'other' at the end
   names(dft2_type2_zz1)
   
-  ## this worked at one point in the development ...
-  # dft2_type2_zz1 <- dft2_type2_zz1[order(variable,
-  #                                        value_labels %like% no_op_short,
-  #                                        value_labels %like% other_please_short,
-  #                                        -prop)]
-  
-  ## ... but this is what is working correctly now
-  dft2_type2_zz1 <- dft2_type2_zz1[order(
-    variable,
-    ## ... variable name
-    value_labels %like% no_op_short,
-    ## ... no opinion: no then yes
-    value_labels %like% other_please_short,
-    ## ... other : no then yes-prop                                    ## ... decreasing proportion
-  )]
+  ## the ordering is sequential : variable, then no_op_short, then  other_please_short, and finally the reverse of proportions
+
+  dft2_type2_zz1 <- dft2_type2_zz1[order(variable,
+                                         value_labels %like% no_op_short,
+                                         value_labels %like% other_please_short,
+                                         -prop)]
   
   dft2_type2_zz1[, item := as.numeric(item)]
 }
@@ -413,6 +405,12 @@ if (length(cols_type3) > 0) {
   cols_type3_in_dft2_data_clean <-
     dft2_data_clean[, names(.SD), .SDcols = patterns('_type3___')]
   cols_type3_in_dft2_data_clean
+  
+  list_type3_unique <-
+    cols_type3 %>%
+    stringr::word(1, sep = '\\___') %>%
+    unique()
+  list_type3_unique
   
   ### 5.1 cols_type3_no_opinion ----
   cols_type3_no_opinion <-
@@ -485,51 +483,41 @@ if (length(cols_type3) > 0) {
   
   
   ### 5.7 order rows according to results ----
-  ### this will sort the table by ... and keep no opinion and other at the end
-  
-  ## this worked at one point in the development ...
-  # dft2_type3_zz1 <- dft2_type3_zz1[order(
-  #   variable,                               ## ... variable name
-  #   -prop,                                  ## ... decreasing proportion
-  #   value_labels %like% no_op_short,        ## ... no opinion: no then yes
-  #   value_labels %like% other_please_short  ## ... other : no then yes
-  #   )]
-  
-  ## ... but this is what is working correctly now
+  ## this will sort the table by variables and keep 'no opinion' and 'other' at the end
+  ## the ordering is sequential : variable, then no_op_short, then  other_please_short, and finally the reverse of proportions
+
   dft2_type3_zz1 <- dft2_type3_zz1[order(
-    variable,
-    ## ... variable name
-    value_labels %like% no_op_short,
-    ## ... no opinion: no then yes
-    value_labels %like% other_please_short,
-    ## ... other : no then yes-prop                                    ## ... decreasing proportion
-  )]
-  
-  
+    variable,                               ## ... variable name
+    value_labels %like% no_op_short,        ## ... no opinion: no then yes
+    value_labels %like% other_please_short  ## ... other : no then yes
+    -prop,                                  ## ... decreasing proportion
+    )]
+
 }
 
 ## . ----
 ## 6. > dft2_dt_comments_m ----
 ## there are comments for each question and one for each section !
-## 
+### . define cols_comments ----
 cols_comments <- dft2_data_clean[, names(.SD), .SDcols = patterns('_comment$')]
 cols_comments
 
-
-
+### . subset dft2_dt_comments ----
 dft2_dt_comments <- dft2_data_clean[, .SD, .SDcols = c('record_id', cols_comments)]
 
+### . melt in dft2_dt_comments_m ----
 dft2_dt_comments_m <- dft2_dt_comments %>%
   melt('record_id', value.name = "item", na.rm = T) %>%
   sjlabelled::remove_label()
 
+### . extract section and statement number 
 dft2_dt_comments_m[, section := extract_section(variable)]
 dft2_dt_comments_m[, statement_number:= extract_statement_number(variable)]
 
-## add the response to the question being commented on ----
+### . add the response to the question being commented on ----
 dft2_dt_comments_m[ , variable_commented := stringr::str_replace_all(variable, "_comment", "")]
 
-
+### . prepare dft2_dt_type1_m for joining ----
 dft2_dt_type1_m |> 
   setnames(c('variable', 'item'),
            c('variable_commented', 'response'))
@@ -537,11 +525,42 @@ dft2_dt_type1_m |>
 dft2_dt_type1_m[, variable_commented := stringr::str_replace_all(variable_commented, "_type1", "")]
 
 
-## left join ---
+### . left join dft2_dt_comments_m with dft2_dt_type1_m ---
 dft2_dt_comments_m[dft2_dt_type1_m,
                    on = .(record_id, variable_commented),
                    response := response]
 
+### . prepare dft2_dt_type2_m for joining ----
+dft2_dt_type2_m |> 
+  setnames(c('variable', 'item'),
+           c('variable_commented', 'response'))
+
+dft2_dt_type2_m[, variable_commented := stringr::str_replace_all(variable_commented, "_type2", "")]
+
+
+### . left join dft2_dt_comments_m with dft2_dt_type2_m ---
+dft2_dt_comments_m[dft2_dt_type2_m,
+                   on = .(record_id, variable_commented),
+                   response := response]
+
+### >> REPRENDRE ICI ----
+# ### . prepare dft2_dt_type3_m for joining ----
+# dft2_dt_type3_m |> 
+#   setnames(c('variable', 'item'),
+#            c('variable_commented', 'response'))
+# 
+# dft2_dt_type3_m[, variable_commented := stringr::str_replace_all(variable_commented, "_type3", "")]
+# 
+# 
+# ### . left join dft2_dt_comments_m with dft2_dt_type3_m ---
+# dft2_dt_comments_m[dft2_dt_type3_m,
+#                    on = .(record_id, variable_commented),
+#                    response := response]
+
+
+
+
+### . order dft2_dt_comments_m ----
 dft2_dt_comments_m <- 
   dft2_dt_comments_m[order(variable_commented, response)]
 

@@ -1,6 +1,6 @@
 ## 00_functions.R
 ## olivier.duperrex@unisante.ch
-## 2023-10-24
+## 2023-10-27
 ## 
 ## 
 ## 
@@ -204,7 +204,7 @@ update_statement_name <- function(dt, metadata, pattern_colname_old, pattern_col
 }
 
 
-## add_var_label_exec_summary ---------------------------------------------
+## add_var_label_exec_summary ---------------------------------------
 #' Clean variable label from html and thank you wording.
 #' 
 #' Update and add string elements as needed. Can be used to clean a variable within a data.table
@@ -233,7 +233,7 @@ add_var_label_exec_summary <- function(x, statement_txt, statement_number) {
 
 ## > Clean data.table -----------------------------------------------
 
-## clean_after_collapse --------------------------------------
+## clean_after_collapse ----
 ## !!! need to sort the conditional formatting if date_cols provided
 
 #' Create year_week and make correction for last or first days for some years
@@ -315,7 +315,7 @@ get_last = function(x) {
     data.table::last()
 }
 
-# remove_NAs_after_collapsing --------------------------------------
+# remove_NAs_after_collapsing ---------------------------------------
 #' Remove NAs with punctuation after collapsing
 #' 
 #' @param x A string obtained after collapsing with `;` as separator
@@ -424,7 +424,7 @@ extract_type <- function(x){
 
 
 
-## extract_statement_number --------------------------------------------------
+## extract_statement_number -----------------------------------------
 #' Extract the statement number
 #' 
 #' @param x A variable name with the statement number just after '_s'
@@ -443,7 +443,7 @@ extract_statement_number <- function(x){
 }
 
 
-## extract_variable_root --------------------------------------------------
+## extract_variable_root --------------------------------------------
 #' Extract the variable root
 #' 
 #' @param x A variable name
@@ -473,7 +473,7 @@ extract_variable_root <- function(x){
 labels_x_gg_bar <- every_second_item(seq(1,9))
 
 
-## gg_bar -------------------------------------------------------
+## gg_bar -----------------------------------------------------------
 #' Mini barplot to insert in a word table
 #' 
 #' @param z A list of values
@@ -516,7 +516,7 @@ gg_boxplot <- function(z) {
     theme_void()
 }
 
-## gg_boxplot_bis -------------------------------------------------------
+## gg_boxplot_bis ---------------------------------------------------
 #' Mini boxplot to insert in a word table
 #' 
 #' @param z A list of values
@@ -605,7 +605,7 @@ gg_histo <- function(z) {
 
 
 
-## > Flextables --------------------------------------------------------
+## > Flextables -----------------------------------------------------
 
 ## set_flextable_defaults ----
 ## voir https://github.com/davidgohel/flextable/issues/383 pour hansi.family
@@ -679,10 +679,10 @@ cols_for_minibar_type2_3_generic <-
 
 
 ## cols_for_comments_participant ----
-cols_for_comments_participant <- c('item', 'response') # , 'responses_participant'
+cols_for_comments_participant <- c('item') 
 
 ## cols_for_comments_participant_type1 ----
-# cols_for_comments_participant_type1 <- c('item', 'value_labels') # , 'responses_participant'
+cols_for_comments_participant_type1 <- c('item', 'response') # response of participant who commented
 
 
 ## cols_for_type_1_exec_summary -----
@@ -752,7 +752,7 @@ create_summary_type1 <- function(x) {
 }
 
 
-## create_flextable_table1 --------------------------------------------------
+## create_flextable_table1 ------------------------------------------
 #' Create table 1 description of participants
 #' 
 #' @param dt Data.table
@@ -793,7 +793,7 @@ create_flextable_table1 <- function(dt,
 }
 
 
-## create_flextable_type_1_exec_summary ----------------------------------
+## create_flextable_type_1_exec_summary -----------------------------
 #' Create a flextable of type 1 question for the executive summary
 #' 
 #' @param dt Data.table containing summary elements and 
@@ -841,7 +841,7 @@ create_flextable_type_1_exec_summary <- function(dt) {
 
 # dt <- type1_zz_combined_round_2_3
 
-## create_flextable_histo_box_type_1_generic ----------------------------------
+## create_flextable_histo_box_type_1_generic ------------------------
 create_flextable_histo_box_type_1_generic <- function(dt) {
   dt %>%
     flextable::flextable(col_keys = cols_for_histo_box_type1_generic) %>%
@@ -913,7 +913,7 @@ create_flextable_histo_box_type_1_generic <- function(dt) {
 }
 
 
-## create_flextable_histo_box_type_1_participant ------------------------------------------
+## create_flextable_histo_box_type_1_participant --------------------
 create_flextable_histo_box_type_1_participant <- function(dt) {
   dt %>%
     flextable::flextable(col_keys = cols_for_histo_box_type1_participant) %>%
@@ -995,11 +995,26 @@ create_flextable_histo_box_type_1_participant <- function(dt) {
   
 }
 
-
-## create_flextable_comments_participant ----------------------------------------------
+## create_flextable_comments_participant ----------------------------
 create_flextable_comments_participant <- function(dt) {
   dt %>%
     flextable::flextable(col_keys = cols_for_comments_participant) %>%
+    set_header_labels(item   = label_comment
+                      # , response = label_response
+    ) %>%
+    # align(part = 'all', j = cols_for_comments_participant[-1], align = 'center') %>%
+    width(c("item"
+            # , 'response'
+    ),
+    width = c(7
+              # , 2
+    ))
+}
+
+## create_flextable_comments_participant_type1 ----------------------
+create_flextable_comments_participant_type1 <- function(dt) {
+  dt %>%
+    flextable::flextable(col_keys = cols_for_comments_participant_type1) %>%
     set_header_labels(item   = label_comment,
                       response = label_response) %>%
     # align(part = 'all', j = cols_for_comments_participant[-1], align = 'center') %>%
@@ -1008,9 +1023,7 @@ create_flextable_comments_participant <- function(dt) {
 }
 
 
-
-
-## create_flextable_minibar_type_2_3_generic ----------------------------------------------
+## create_flextable_minibar_type_2_3_generic ------------------------
 
 
 create_flextable_minibar_type_2_3_generic <- function(dt) {
@@ -1061,7 +1074,7 @@ create_flextable_minibar_type_2_3_generic <- function(dt) {
 }
 
 
-## create_flextable_minibar_type_2_3_participant ----------------------------------------------
+## create_flextable_minibar_type_2_3_participant --------------------
 
 
 create_flextable_minibar_type_2_3_participant <- function(dt) {
