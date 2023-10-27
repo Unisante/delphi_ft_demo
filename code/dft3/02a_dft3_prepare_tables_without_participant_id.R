@@ -51,7 +51,7 @@ source(here::here('code', 'dft3', '01c_dft3_define_cols.R'), encoding = 'UTF-8')
 ## 2. > cols_type1 -------------------------------------------------
 ### select cols ending with _type1
 # cols_type1 <- dft3_data_clean[, names(.SD), .SDcols = patterns('_type1$')]
-cols_type1
+cols_type1 # defined in 01c_dft3_define_cols.R
 
 
 

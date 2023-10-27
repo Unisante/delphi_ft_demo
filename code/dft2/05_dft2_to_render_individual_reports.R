@@ -1,6 +1,6 @@
 ## 05_dft2_to_render_individual_reports.R
 ## olivier.duperrex@unisante.ch
-## 2022-09-13
+## 2023-10-24
 
 
 here::here()
@@ -30,7 +30,11 @@ length(list_record_id)
 
 
 ## dft2_report_per_participant.Rmd ------------------------------------------
-# list_record_id <- c(2,3)
+## uncomment one of the line below to test with a few
+## remember to comment it again when you are ready to create all the individual reports
+
+# list_record_id <- head(list_record_id, n = 4)
+# list_record_id <- tail(list_record_id, n = 10)
 
 list_record_id
 

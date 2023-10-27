@@ -22,6 +22,8 @@ current_round <- "Executive"
 
 report_type <- "Summary"
 
+# list_sections <- list_sections_overall
+
 ## . local functions ----------------------------------------------
 source(here::here('code', '00_functions.R'), encoding = 'UTF-8')
 
@@ -64,9 +66,9 @@ pacman::p_load(flextable, data.table, magrittr, ggplot2, ftExtra, sjPlot)
 pacman::p_loaded()
 
 
-load(here::here('output', 'RData', 'type1_zz_combined_round_2_3.RData'))
+load(here::here('output', 'RData', 'dt_exec_summary.RData'))
 
-# rm(type1_zz_combined_round_2_3)
+# rm(dt_exec_summary)
 ```
 
 
@@ -149,7 +151,7 @@ block_pour_docx(docx_to_get)
 
 ```{r,include = FALSE}
 
-type1_zz_combined_round_2_3 %>% sjmisc::frq(group_exec_summary)
+dt_exec_summary %>% sjmisc::frq(group_exec_summary)
 
 ```
 
@@ -159,7 +161,7 @@ type1_zz_combined_round_2_3 %>% sjmisc::frq(group_exec_summary)
 ## Accord consensuel atteint
 
 
-t1a <- type1_zz_combined_round_2_3[group_exec_summary == 'agree_with_consensus',]
+t1a <- dt_exec_summary[group_exec_summary == 'agree_with_consensus',]
 
 label_var_execsummary <- label_execsummary_agree_consensus_yes
 
@@ -201,7 +203,7 @@ ft_type1_exec
 ## Consensual disagreement reached
 ## Désaccord consensuel atteint
 
-t1b <- type1_zz_combined_round_2_3[group_exec_summary == 'disagree_with_consensus',]
+t1b <- dt_exec_summary[group_exec_summary == 'disagree_with_consensus',]
 
 label_var_execsummary <- label_execsummary_disagree_consensus_yes
 
@@ -245,9 +247,9 @@ ft_type1_exec
 
 ## subset rows ----
 t2a <-
-  type1_zz_combined_round_2_3[group_exec_summary %in% c('no_agree',
-                                                        'agree_without_consensus',
-                                                        'disagree_without_consensus'), ]
+  dt_exec_summary[group_exec_summary %in% c('no_agree',
+                                            'agree_without_consensus',
+                                            'disagree_without_consensus'),]
 
 ## reorder as will be in same group
 setorder(t2a, section_order, type)

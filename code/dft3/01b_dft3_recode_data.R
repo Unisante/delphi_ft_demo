@@ -30,7 +30,6 @@ source(here::here('code', '000_parameters.R'), encoding = 'UTF-8')
 dft3_data_redcapr_raw[dft3_0_email %in% email_tester, dft3_0_email := NA]
 
 
-
 ## .. Quick look at the dataset ----
 ## another nice way to look at it
 ## thanks to https://gt.albert-rapp.de/
@@ -98,14 +97,13 @@ dft3_metadata[field_name %like%  '[a-d]_comment$',
               variable_label := paste0(stringr::word(field_label, 1, sep = "\\n"), 
                                        comment_txt_plural)]
 
-
 ## .. clean_variable_label ----
 dft3_metadata[, variable_label := clean_variable_label(variable_label, thankyou_string)]
 
 ## .. chk1 ----
 chk1 <- dft3_metadata[, .(field_name, variable_label, field_label)] 
 
-
+## 3. Rename variables ----
 cols_0 <- dft3_metadata[field_name %like% '_0_', field_name]
 cols_0
 
@@ -169,7 +167,6 @@ dft3_lookup_final[!(variable_label %like% 'SECTION'),
 
 dft3_lookup_final[!(variable_label %like% 'SECTION'), 
              variable_label := stringr::str_replace_all(variable_label, ' ;', ' -')]
-
 
 dft3_lookup_final[, variable_label := stringr::str_replace_all(variable_label, '"', '')]
 
@@ -244,7 +241,7 @@ if (anyDuplicated(dft3_data_redcapr_1[, dft3_0_email]) == 0) {
   dt0 <- data_deduplicated[record_id %like% ';',]
   
   ### .. cols_to_recode ----
-  ### # need to be modified if also type2 or type3 questions - see 01b_dft2_recode_data.R
+  ### # need to be modified if also type2 or type3 questions - see 01b_dft3_recode_data.R
   cols_to_recode <- c(cols_type1) 
   
   ## for cols_type1 we get the last value that is not NA
@@ -270,7 +267,7 @@ if (anyDuplicated(dft3_data_redcapr_1[, dft3_0_email]) == 0) {
   foo2[value %like% '; NA', .N]
   
   ## .. recode record_id : keep the latest ----
-  dt0[, record_id := get_last(record_id), keyby = dft3_0_emai]
+  dt0[, record_id := get_last(record_id), keyby = dft3_0_email]
   
   
   ## .. dft3_data_almost_clean -----------------------------------------------------
@@ -416,7 +413,6 @@ purrr::walk2(dft3_zzz_type1$gg, dft3_zzz_type1$img_path, function(gg, path) {
   dev.off()
 })
 
-
 ## .. Quick look at the dataset ----
 t0_clean <- 
   dft3_data_clean[, .SD, .SDcols = !cols_to_exclude]  |> 
@@ -428,6 +424,7 @@ t0_clean |>
   gtsummary::as_gt() |>
   gt::tab_header(title = "Descrpition of variables from dft3_data_clean (without comments and email)") |>
   gt::gtsave(filename = here::here('output', 'checks', 't0_clean_data_descriptive.docx'))
+
 ## 10. save ----------------------------------------------------------
 
 save(dft3_data_clean, file = here::here('data', 'dft3', 'dft3_data_clean.RData'))

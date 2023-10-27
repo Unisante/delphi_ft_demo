@@ -1,6 +1,6 @@
 ## 000_parameters.R
 ## Prepared by olivier.duperrex@unisante.ch
-## Modified on 2023-05-08
+## Modified on 2023-10-25
 ## 
 ## Elements that can be modified according to the topic, the language,
 ## and desired adjustments on the output
@@ -30,10 +30,15 @@ path_texts_intro_local <- here::here('texts_intro')
 
 
 ## . authors ----
-authors_text <- "Camille Velarde Crézé, Luc Lebon, Vincent Faivre, Olivier Duperrex - Unisanté" # replace with yours
+authors_text <-
+  "Camille Velarde Crézé, Luc Lebon, Vincent Faivre, Olivier Duperrex - Unisanté" # replace with yours
 
 ## . email_tester ---------------------------------------------------
-email_tester <- c('participant_27@some.email', 'tester_2@some.email')
+email_tester <-
+  c(
+    'participant_27@some.email', 
+    'tester_2@some.email'
+    )
 
 
 ## . reports titles -----------------------------------------------
@@ -154,7 +159,10 @@ thankyou_string <- stringr::regex("
 
 ## . sections: lists and labels ----
 
-list_sections <- c('Z', 'A', 'B', 'C')
+
+list_sections_round_2 <- c('Z', 'A', 'B', 'C')
+list_sections_round_3 <- c('Z', 'A', 'B', 'C')
+
 
 label_section_Z_long  <- "Problématique et interdiction de vente"
 label_section_Z       <- "Préambule"
@@ -162,9 +170,11 @@ label_section_A       <- "Section A - Composition du produit & aspects marketing
 label_section_B       <- "Section B - Vente, consommation, taxation & prix"
 label_section_C       <- "Section C - Aspects écologiques & éléments transversaux"
 
-list_labels_sections  <- c(label_section_Z_long, label_section_A, label_section_B, label_section_C)
+list_labels_sections_round_2  <- c(label_section_Z_long, label_section_A, label_section_B, label_section_C)
+list_labels_sections_round_3  <- c(label_section_Z_long, label_section_A, label_section_B, label_section_C)
 
-
+list_sections_overall <- list_sections_round_2
+list_labels_sections_overall <- list_labels_sections_round_2
 
 
 ## . label txt ----
@@ -180,12 +190,12 @@ comment_txt_singular  <- 'Commentaire'
 comment_txt_plural    <- 'Commentaires'
 
 ## . label short for various variables ----
-label_gender_short    <- 'Genre'
-label_job_short       <- 'Activité professionnelle'
-label_job_o_short     <- 'Activité professionnelle - préciser'
-label_joblang_short   <- 'Canton activité professionnelle'
-label_email_short     <- 'email'
-label_conflicts_short <- "Conflits d'intérêts"
+# label_gender_short    <- 'Genre'
+# label_job_short       <- 'Activité professionnelle'
+# label_job_o_short     <- 'Activité professionnelle - préciser'
+# label_joblang_short   <- 'Canton activité professionnelle'
+# label_email_short     <- 'email'
+# label_conflicts_short <- "Conflits d'intérêts"
 
 label_agreement       <- 'Accord'
 
@@ -344,7 +354,103 @@ subtitle_overall <- "Consensus d'expert selon une approche 'Delphi-Fast track'"
 statement_numbers_in_dft2_to_keep_for_execsummary <- c(4, 11, 18)
 
 
+## 5. define the descriptive variables by type  ----
+## . create a temporary table depending on which one is available
 
+if (exists('dft2_data_redcapr_raw') == TRUE) {
+  dt0 <- dft2_data_redcapr_raw
+} 
+
+if(exists('dft2_data_clean') == TRUE) {
+  dt0 <- dft2_data_clean
+}
+
+
+## . cols_0 : descriptive variables ----
+## .. START condition 1 ----
+if (exists('dt0') == TRUE) {
+  cols_0 <- grep("_0_", names(dt0), value = TRUE)
+  
+  cols_0
+  class(cols_0)
+  data.table(cols_0)
+  
+  ## . cols_0_subset_type3 : characteristics variables with value labels in type3 format ----
+  ## this will be added to the lookup table
+  cols_0_subset_type3 <- grep("__", cols_0, value = TRUE)
+  
+  if (length(cols_0_subset_type3) > 0) {  
+    cols_0_subset_type3_unique <-
+      cols_0_subset_type3 %>%
+      stringr::word(1, sep = '\\___') %>%
+      unique()
+  }
+  
+  
+  ## . cols_0_subset_value_labels : initial variables with value labels ----
+  cols_0_subset_value_labels <- c(
+    'dft2_0_gender',
+    'dft2_0_job',
+    'dft2_0_joblang'
+  )
+  
+  
+  ## . create a data.table with short variable labels ----
+  ## note the added categorical variable 'dft2_0_nb_patients_cat'
+  
+  dt_labels_cols_0 <-
+    fread(
+      "
+  field_name, labels_cols_0_short
+  dft2_0_gender,   Genre
+  dft2_0_job,   Activité professionnelle
+  dft2_0_job_o,   Activité professionnelle - préciser
+  dft2_0_joblang,   Canton activité professionnelle
+  dft2_0_email,   email
+  dft2_0_conflicts,   Conflits d'intérêts
+  dft2_0_conflicts_raw,   Conflits d'intérêts - réponse initiale
+"
+    )
+  
+
+  writexl::write_xlsx(dt_labels_cols_0,
+                      path = here::here('output', 'checks', 'dt_labels_cols_0.xlsx'))
+  save(dt_labels_cols_0,
+       file = here::here('output', 'RData', 'dt_labels_cols_0.RData'))
+  
+  
+  
+  ## . cols_0_subset_for_table_1 ----
+  ## used in '02a_dft2_prepare_tables_without_participant_id.R'
+  ## define here the variable to include in the Table 1
+  cols_0_subset_for_table_1 <-
+    c(cols_0_subset_value_labels,
+      # cols_0_subset_continuous_cat,
+      cols_0_subset_type3)
+  
+  cols_0_subset_for_table_1
+  
+  ## . order_dft2_0_table_1 ----
+  ## used in '02a_dft2_prepare_tables_without_participant_id.R'
+  ## define here the order in which the variables will be listed
+  order_dft2_0_table_1 <- c(
+    'dft2_0_gender',
+    'dft2_0_job',
+    'dft2_0_joblang'
+  )
+  order_dft2_0_table_1
+  
+}
+## .. END condition 1 ----
+
+caption_table_1 <- "
+NB: Proportions are calculated on number of participants.
+* Plusieurs réponses possibles - la somme des proportions peut donc dépasser le 100%" 
+
+
+## 6. conflicts_keywords ----
+## Need to update according to the responses - either in 01b_ft2_recode_data.R or 'output/checks/chk_dft2_0_conflicts.xlsx'
+conflicts_keywords <- 'aucun|0|none|pas de|ras'
 
 
 

@@ -98,7 +98,7 @@ if (length(selected_cols) > 0) {
 ```{r }
 # section_comment ----
 
-selected_section_comment <- paste0('dft2_', tolower(selected_section), '_comment')
+selected_section_comment <- paste0('dft3_', tolower(selected_section), '_comment')
 
 if (selected_section == 'Z') {
   

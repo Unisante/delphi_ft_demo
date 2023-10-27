@@ -1,33 +1,33 @@
 ## 02a_dft2_prepare_tables_without_participant_id.R
 ## olivier.duperrex@unisante.ch
-## 2023-03-17
+## 2023-10-24
 
 ## this script will generate the tables and graphs without individual data
 
  
-## 0.a load libraries ----
+## 0. load libraries ----
 pacman::p_loaded()
 
 pacman::p_load(flextable, data.table, magrittr, ggplot2, ftExtra, sjPlot)
 
 pacman::p_loaded()
 
-## 0.b source 00_functions.R ----------------------------------------------
-source(here::here('code', '00_functions.R'), encoding = 'UTF-8')
-# source(here::here('code', '_sanpit_new_plots_bar_boxplot_bis.R'), encoding = 'UTF-8')
-
-## 1. load RData ----
-
+## 1.1 load RData ----
 
 load(here::here('data', 'dft2', 'dft2_data_clean.RData'))
 load(here::here('data', 'dft2', 'dft2_lookup_final.RData'))
 load(here::here('data', 'dft2', 'dft2_lookup_value_labels_final.RData'))
 
-### 1.4. total_participants ----
+## 1.2 source 00_functions.R ----------------------------------------------
+source(here::here('code', '00_functions.R'), encoding = 'UTF-8')
+# source(here::here('code', '_sanpit_new_plots_bar_boxplot_bis.R'), encoding = 'UTF-8')
+
+
+## 1.3 total_participants ----
 (total_participants <- dft2_data_clean[,.N])
 
 
-### 1.5 source 01d_define_cols.R ----
+## 1.4 source 01d_define_cols.R ----
 source(here::here('code', 'dft2', '01c_dft2_define_cols.R'), encoding = 'UTF-8')
 
 # dft2_type3_zz0 ## see below - different approach because of radio buttons as separate variables in dft2_data_clean
@@ -35,7 +35,7 @@ source(here::here('code', 'dft2', '01c_dft2_define_cols.R'), encoding = 'UTF-8')
 
 
 ## . ----
-## 2. > cols_type0 : characteristics --------------------------------
+## 2. > cols_0_subset_for_table_1 : characteristics --------------------------------
 
 
 cols_type0 <- c("dft2_0_gender",
@@ -46,59 +46,125 @@ cols_type0 <- c("dft2_0_gender",
 cols_type0
 
 
-## . dft2_type0_zz0 ----
-dft2_type0_zz0 <- dft2_lookup_value_labels_final[field_name %in% cols_type0, .(variable = field_name, item = id_value_labels, value_labels)]
+## . dft2_type0_value_labels_zz0 ----
+## .. cols_0_subset_for_table_1
+dft2_type0_value_labels_zz0 <-
+  dft2_lookup_value_labels_final[field_name %in% cols_0_subset_for_table_1, 
+                                 .(variable = field_name, 
+                                   item = id_value_labels, 
+                                   value_labels)]
 
 ## .. recode canton ----
-dft2_type0_zz0[, value_labels := stringr::str_remove(value_labels, 'Canton de |Canton du ')]
+dft2_type0_value_labels_zz0[, value_labels := stringr::str_remove(value_labels, 'Canton de |Canton du ')]
 
-dft2_type0_zz0[variable == 'dft2_0_joblang',]
+names(dft2_type0_value_labels_zz0)
 
-names(dft2_type0_zz0)
+## .. joblang ----
+# dft2_type0_value_labels_zz0[variable == 'dft2_0_joblang',]
 
 ## .. job ----
 
-dft2_type0_zz0[variable == 'dft2_0_job',]
+# dft2_type0_value_labels_zz0[variable == 'dft2_0_job',]
 
-## .. dft2_dt_type0_m ----
 
-dft2_dt_type0 <- dft2_data_clean[, .SD, .SDcols = c('record_id', cols_type0)]
 
-dft2_dt_type0_m <- dft2_dt_type0 %>%
+## . dft2_dt_type0_value_labels_m ----
+
+dft2_dt_type0_value_labels <- 
+  dft2_data_clean[, .SD, .SDcols = c('record_id', cols_0_subset_for_table_1)]
+
+dft2_dt_type0_value_labels_m <- 
+  dft2_dt_type0_value_labels %>%
   melt('record_id', value.name = "item", na.rm = T)
 
 
-### .. dft2_type0_counts ----
-dft2_type0_counts <-
-  dft2_dt_type0_m[, .N, keyby = .(variable, item)]
-str(dft2_type0_counts)
+## . dft2_type0_value_labels_counts ----
+dft2_type0_value_labels_counts <-
+  dft2_dt_type0_value_labels_m[, .N, keyby = .(variable, item)]
 
-dft2_type0_counts[, item := as.numeric(item)]
+str(dft2_type0_value_labels_counts)
 
-### .. dft2_type0_zz1 ------------------------------------------------------
+dft2_type0_value_labels_counts[, item := as.numeric(item)]
+## . dft2_type0_value_labels_zz1 ------------------------------------------------------
 
 
-dft2_type0_zz1 <- dft2_type0_zz0[dft2_type0_counts, on = .(variable,
-                                                           item),
-                                 n := N]
+dft2_type0_value_labels_zz1 <-
+  dft2_type0_value_labels_zz0[dft2_type0_value_labels_counts, 
+                              on = .(variable, item),
+                              n := N]
 
 ### .. replace NA by 0 ----
-dft2_type0_zz1[is.na(n), n := 0]
+dft2_type0_value_labels_zz1[is.na(n), n := 0]
 
 
 ### .. add prop ----
-dft2_type0_zz1[, prop := n / total_participants, keyby = variable]
+dft2_type0_value_labels_zz1[, prop := formattable::percent(n / total_participants, 1), keyby = variable]
 
 
 ### .. order rows ----
-dft2_type0_zz1 <- dft2_type0_zz1[order(variable, 
-                                       value_labels %like% other_country,
-                                       value_labels %like% other_please_short,
-                                       -prop)]
+dft2_type0_value_labels_zz1 <-
+  dft2_type0_value_labels_zz1[order(
+    variable,
+    value_labels %like% other_country,
+    value_labels %like% other_please_short,
+    -prop
+  )]
 
 ### .. left join to add variable label ----
-dft2_type0_zz1[dft2_lookup_final, on = 'variable', variable_label := variable_label]
-setcolorder(dft2_type0_zz1, 'variable_label')
+dft2_type0_value_labels_zz1[dft2_lookup_final, 
+                            on = 'variable', 
+                            variable_label := variable_label]
+
+setcolorder(dft2_type0_value_labels_zz1, 'variable_label')
+
+
+
+## . dft2_type0_3_zz0 -------------------------------------------------------
+dft2_type0_3_zz0 <-
+  dft2_data_clean[, .(
+    item_name = names(.SD),
+    value_labels = lapply(.SD, sjlabelled::get_label),
+    n = lapply(.SD, sum)
+  ), .SDcols = cols_0_subset_type3]
+
+### .. extract variable from item_name ----
+dft2_type0_3_zz0[, variable := stringr::word(item_name, 1, sep = stringr::fixed("__"))]
+dft2_type0_3_zz0[, item := stringr::str_extract(item_name, "(\\d+$)")]
+
+dft2_type0_3_zz0[, n := as.numeric(n)]
+
+### .. replace NA by 0 ----
+dft2_type0_3_zz0[is.na(n), n := 0]
+
+### .. add prop ----
+dft2_type0_3_zz0[, prop := formattable::percent(n / total_participants, 1), keyby = variable]
+
+
+
+names(dft2_type0_value_labels_zz1)
+names(dft2_type0_3_zz0)
+
+### .. left join to add variable label ----
+dft2_type0_3_zz0[dft2_lookup_final,
+                 on = 'variable', 
+                 variable_label := variable_label]
+setcolorder(dft2_type0_3_zz0, 
+            names(dft2_type0_value_labels_zz1))
+
+
+## . dft2_type0_zz1 ------------------------------------------------------
+dft2_type0_zz1 <-
+  rbindlist(list(dft2_type0_value_labels_zz1 ,
+                 dft2_type0_3_zz0[ , .SD, .SDcols = !'item_name']), fill = TRUE)
+
+dft2_type0_zz1[, value_labels := as.character(value_labels)  ]
+
+## .. sort according to questionnaire ----
+## `order_dft2_0_table_1` is defined in '000_parameters.R'
+## thanks to https://tim-tiefenbach.de/post/2023-ordering-rows/ !
+dft2_type0_zz1 <- 
+  dft2_type0_zz1[order(factor(variable, levels = order_dft2_0_table_1))]
+
 
 
 ## . ----
@@ -112,6 +178,7 @@ cols_type1  # defined in 01c_dft2_define_cols.R
 dft2_dt_type1_m <- dft2_data_clean[, .SD, .SDcols = c('record_id', cols_type1)] %>%
   melt('record_id', value.name = "item", na.rm = T)  %>%
   sjlabelled::remove_label()
+
 dft2_dt_type1_m
 
 ## check all values are between 1 and 9 ---
@@ -459,7 +526,24 @@ dft2_dt_comments_m <- dft2_dt_comments %>%
 dft2_dt_comments_m[, section := extract_section(variable)]
 dft2_dt_comments_m[, statement_number:= extract_statement_number(variable)]
 
+## add the response to the question being commented on ----
+dft2_dt_comments_m[ , variable_commented := stringr::str_replace_all(variable, "_comment", "")]
 
+
+dft2_dt_type1_m |> 
+  setnames(c('variable', 'item'),
+           c('variable_commented', 'response'))
+
+dft2_dt_type1_m[, variable_commented := stringr::str_replace_all(variable_commented, "_type1", "")]
+
+
+## left join ---
+dft2_dt_comments_m[dft2_dt_type1_m,
+                   on = .(record_id, variable_commented),
+                   response := response]
+
+dft2_dt_comments_m <- 
+  dft2_dt_comments_m[order(variable_commented, response)]
 
 
 

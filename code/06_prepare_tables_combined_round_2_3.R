@@ -1,10 +1,10 @@
 ## 06_prepare_tables_combined_round_2_3.R
 ## olivier.duperrex@unisante.ch
-## 2023-04-17
+## 2023-10-25
 
 ## this script will combine only the type1 tables and graphs without individual data
 ## from dft2 (round 2) and dft3 (round 3)
-## 
+##
 
 ## 0.a load libraries ----
 pacman::p_loaded()
@@ -39,7 +39,7 @@ purrr::walk(list_files$filename, load, envir = .GlobalEnv)
 
 # setdiff(names(type1_zz_combined_round_2), names(type1_zz_combined))
 
-type1_zz_combined_round_2_3 <- 
+type1_zz_combined_round_2_3 <-
   rbindlist(list(dft2_type1_zz_combined, dft3_type1_zz_combined))
 
 
@@ -47,69 +47,67 @@ type1_zz_combined_round_2_3 <-
 
 type1_zz_combined_round_2_3[, dft_round := stringr::str_extract(variable, "[0-9]+")]
 
-## .. group_exec_summary ----
+## . group_exec_summary ----
 ## agree_with_consensus in round 2 --
 ## !! make sure you have updated statement_numbers_in_dft2_to_keep_for_execsummary in section 4 of 000_parameters.R !! ----
-## some of the statements of round 2 have been refined in dft3, so are not kept in executive summary
 
-type1_zz_combined_round_2_3[dft_round == 2 &
-                              statement_number %in% statement_numbers_in_dft2_to_keep_for_execsummary,
-                            `:=`(agreement_and_consensus = 1,
-                                 group_exec_summary = 'agree_with_consensus')]
+## .. agree_with_consensus ----
 
-## agree_with_consensus in round  3 --
-
-type1_zz_combined_round_2_3[dft_round == 3 &
-                              agreement == 'ok' & 
+type1_zz_combined_round_2_3[agreement == 'ok' &
                               consensus == 'ok',
                             `:=`(agreement_and_consensus = 1,
                                  group_exec_summary = 'agree_with_consensus')]
 
-## statements of round 2 that did not reach consensus have been refined in dft3, so are not kept in executive summary
-
-## disagree_with_consensus in round 3 --
-type1_zz_combined_round_2_3[dft_round == 3 &
-                              agreement == 'not_ok' &
-                              consensus == 'ok', 
+## .. disagree_with_consensus ----
+type1_zz_combined_round_2_3[agreement == 'not_ok' &
+                              consensus == 'ok',
                             group_exec_summary := 'disagree_with_consensus']
 
 
-## agree_without_consensus in round 3 --
-type1_zz_combined_round_2_3[dft_round == 3 &
-                              agreement == 'ok' &
-                              is.na(consensus), 
+## .. agree_without_consensus ----
+type1_zz_combined_round_2_3[agreement == 'ok' &
+                              is.na(consensus),
                             group_exec_summary := 'agree_without_consensus']
 
-## disagree_without_consensus in round 3 --
-type1_zz_combined_round_2_3[dft_round == 3 &
-                              agreement == 'not_ok' &
-                              is.na(consensus), 
+## .. disagree_without_consensus ----
+type1_zz_combined_round_2_3[agreement == 'not_ok' &
+                              is.na(consensus),
                             group_exec_summary := 'disagree_without_consensus']
 
 
-## no_agree in round 3 --
-type1_zz_combined_round_2_3[dft_round == 3 &
-                              is.na(agreement), 
+## .. no_agree ----
+type1_zz_combined_round_2_3[is.na(agreement),
                             group_exec_summary := 'no_agree']
 
-chk_recode_exec_summary <- type1_zz_combined_round_2_3[, .N, keyby = .(dft_round, agreement, consensus, group_exec_summary)]
-chk_recode_exec_summary
+## .. add variable to_keep for overall report ----
+type1_zz_combined_round_2_3[dft_round == 2 &
+                              statement_number %in% statement_numbers_in_dft2_to_keep_for_execsummary, 
+                            to_keep := 1][dft_round == 3, to_keep := 1]
+
+
+chk_recode_exec_summary_all <- type1_zz_combined_round_2_3[, .N, keyby = .(dft_round, agreement, consensus, group_exec_summary, to_keep)]
+
+chk_recode_exec_summary_all
 
 writexl::write_xlsx(
-  chk_recode_exec_summary,
-  path = here::here('output', 'checks', 'chk_recode_exec_summary.xlsx')
+  chk_recode_exec_summary_all,
+  path = here::here('output', 'checks', 'chk_recode_exec_summary_all.xlsx')
 )
+
+## 4.0 dt_exec_summary ----
+dt_exec_summary <- 
+  type1_zz_combined_round_2_3[to_keep == 1,]
 
 ## 4.1 add a row with section_txt as subheader ----
 
-names(type1_zz_combined_round_2_3)
+names(dt_exec_summary)
 
 ## .. get the list of values ----
 list_group_exec_summary <- 
-  type1_zz_combined_round_2_3[!is.na(group_exec_summary), unique(group_exec_summary)]
+  dt_exec_summary[!is.na(group_exec_summary), unique(group_exec_summary)]
 
 list_section <- 
-  type1_zz_combined_round_2_3[!is.na(section), unique(section)]
+  dt_exec_summary[!is.na(section), unique(section)]
 
 ## .. create a new empty table ----
 ## using Cross-Join from data.table
@@ -118,71 +116,76 @@ dt0 <-
      section = list_section)
 
 ## .. add type ---
+## will be used in the word document as tables headings !
 dt0[, type := 'text']
 
-## .. combine type1_zz_combined_round_2_3 with dt0 ----
-type1_zz_combined_round_2_3 <-
-  rbindlist(list(type1_zz_combined_round_2_3, dt0), fill = TRUE)
+## .. combine dt_exec_summary with dt0 ----
+dt_exec_summary <-
+  rbindlist(list(dt_exec_summary, dt0), fill = TRUE)
 
 ## .. reorder ----
-type1_zz_combined_round_2_3 <- 
-  type1_zz_combined_round_2_3[order(group_exec_summary, section, type)]
+dt_exec_summary |> 
+  setcolorder(c('group_exec_summary', 'section', 'type'))
+
+dt_exec_summary <- 
+  dt_exec_summary[order(group_exec_summary, section, type)]
 
 
 ## 4.2 recode section ----
 
-type1_zz_combined_round_2_3[, .N, section]
+dt_exec_summary[, .N, section]
 
 
-type1_zz_combined_round_2_3[, section_txt := fcase(
+dt_exec_summary[, section_txt := fcase(
   section == "Z", label_section_Z_long,
   section == "A", label_section_A,
   section == "B", label_section_B,
   section == "C", label_section_C
-                            
+  
 )]
 
 
-type1_zz_combined_round_2_3[, section_order := fcase(
+dt_exec_summary[, section_order := fcase(
   section == "Z", 1,
   section == "A", 2,
   section == "B", 3,
   section == "C", 4
-  )]
+)]
 
 
 chk_recode_section <- 
-  type1_zz_combined_round_2_3[, .N, keyby = .(section_order, section, section_txt)]
+  dt_exec_summary[, .N, keyby = .(section_order, section, section_txt)]
 
 chk_recode_section
 
 
 ## 4.3 img_path ----
 ## define the path and the name of the image to correspond to variable name
-type1_zz_combined_round_2_3[!is.na(variable), 
-                            img_path := here::here('output', 'png', paste0(variable, ".png"))]
+dt_exec_summary[!is.na(variable), 
+                img_path := here::here('output', 'png', paste0(variable, ".png"))]
 
 
-setcolorder(type1_zz_combined_round_2_3, 
+setcolorder(dt_exec_summary, 
             c('dft_round', 'group_exec_summary', 'section_order', 'section', 'section_txt'))
 
-setorder(type1_zz_combined_round_2_3, 
+setorder(dt_exec_summary, 
          group_exec_summary, section_order)
 
 ## https://stackoverflow.com/a/37881577/6176250
 ## setorder(dumdt[, .r := order(to_ord)], .r)[, .r := NULL]
 
 chk1 <-
-  type1_zz_combined_round_2_3[, .(
+  dt_exec_summary[, .(
+    to_keep,
+    group_exec_summary,
+    agreement_and_consensus,
     section,
     section_txt,
     dft_round,
     statement_number,
     variable,
     agreement,
-    consensus,
-    group_exec_summary,
-    agreement_and_consensus
+    consensus
   )]
 
 chk1 %>% sjmisc::frq(group_exec_summary)
@@ -191,32 +194,35 @@ chk1 %>% sjmisc::frq(group_exec_summary)
 
 ## 4.4 recode glue variables ----
 ## transform class glue to as.character because flextable:as_grouped_data has problem with data.table::rbindlist when creating subtables
-type1_zz_combined_round_2_3[, responses := as.character(responses)]
-type1_zz_combined_round_2_3[, stats := as.character(stats)]
+dt_exec_summary[, responses := as.character(responses)]
+dt_exec_summary[, stats := as.character(stats)]
 
 
 
 ## 4.5 recode var_label ----
 ## the var_label contains the statement_number after a statement_txt
-type1_zz_combined_round_2_3[statement_number == 10, var_label]
+dt_exec_summary[statement_number == 1, var_label]
+
+## . recode 'Affirmation' to 'Enoncé' ----
+dt_exec_summary[var_label %like% 'Affirmation', var_label := stringr::str_replace_all(var_label, 'Affirmation', 'Enoncé')]
 
 ## . so we get rid of the elements with statement number for all the labels ----
 ## see add_var_label_exec_summary() in 00_functions.R for details
 
-type1_zz_combined_round_2_3[, var_label_exec_summary := add_var_label_exec_summary(var_label, statement_txt, statement_number)]
+dt_exec_summary[, var_label_exec_summary := add_var_label_exec_summary(var_label, statement_txt, statement_number)]
 
-type1_zz_combined_round_2_3[statement_number == 10, .(var_label, var_label_exec_summary)]
+dt_exec_summary[statement_number == 1, .(var_label, var_label_exec_summary)]
 
 
-type1_zz_combined_round_2_3[type == 'text', var_label_exec_summary := section_txt]
+dt_exec_summary[type == 'text', var_label_exec_summary := section_txt]
 
 ## . and we replace NULL by NA to avoid errors in the plot cols ----
-type1_zz_combined_round_2_3[, names(type1_zz_combined_round_2_3) := lapply(.SD, function(x) replace(x, x=='NULL', ''))]
+dt_exec_summary[, names(dt_exec_summary) := lapply(.SD, function(x) replace(x, x=='NULL', ''))]
 
 
 ## .. and check that is what you want
 chk2 <-
-  type1_zz_combined_round_2_3[, .(
+  dt_exec_summary[, .(
     section,
     type,
     variable,
@@ -229,7 +235,7 @@ chk2 <-
 
 ## 5.  save ----
 ## 
-save(type1_zz_combined_round_2_3, file = here::here('output', 'RData', 'type1_zz_combined_round_2_3.RData'))
+save(dt_exec_summary, file = here::here('output', 'RData', 'dt_exec_summary.RData'))
 
-writexl::write_xlsx(type1_zz_combined_round_2_3,
-                    path = here::here('output', 'checks', 'type1_zz_combined_round_2_3.xlsx'))
+writexl::write_xlsx(dt_exec_summary,
+                    path = here::here('output', 'checks', 'dt_exec_summary.xlsx'))

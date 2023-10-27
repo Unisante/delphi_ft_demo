@@ -1,9 +1,9 @@
 ## 01b_dft2_recode_data.R ----
 ## olivier.duperrex@unisante.ch
-## 2023-04-17
+## 2023-10-24
 
 
-## 1. Loading -----------------------------------------------------
+## 0. Loading -----------------------------------------------------
 ## .. load libraries ----
 pacman::p_loaded()
 
@@ -20,18 +20,77 @@ load(here::here('data', 'redcap_data_raw', 'dft2_data_redcapr_raw.RData'))
 ## .. local functions ----
 source(here::here('code', '00_functions.R'), encoding = 'UTF-8')
 
+## .. Quick look at the dataset ----
+## if lines below don't work, just comment them
+## another nice way to look at it
+## thanks to https://gt.albert-rapp.de/
+
+setcolorder(dft2_data_redcapr_raw, c('record_id', 'dft2_0_email'))
+names(dft2_data_redcapr_raw)
+
+
+cols_to_exclude <- grep("_email|_c$|_comment", names(dft2_data_redcapr_raw), value = TRUE)
+cols_to_exclude
+
+# chk <- dft2_data_redcapr_raw[, .SD, .SDcols = !cols_to_exclude] |> names()
+# chk
+
+t0 <- 
+  dft2_data_redcapr_raw[, .SD, .SDcols = !cols_to_exclude]  |> 
+  gtsummary::tbl_summary()
+
+t0
+
+t0 |>
+  gtsummary::as_gt() |>
+  gt::tab_header(title = "Description of variables from dft2_data_redcapr_raw (without comments and email)") |>
+  gt::gtsave(filename = here::here('output', 'checks', 't0_raw_data_descriptive.docx'))
+
+
+## 1. recode some variables ----
+## .. chk_participants_raw ----
+
+# (id_to_check <- c(2,9))
+# (email_to_check <- dft2_data_redcapr_raw[record_id %in% id_to_check, unique(dft2_0_email)])
+
+## dft2_0_email tolower ----
+dft2_data_redcapr_raw |> sjmisc::frq(dft2_0_email) ## some have capital letters
+
+dft2_data_redcapr_raw[, dft2_0_email:= tolower(dft2_0_email)]  ## make all letters as lower
+
+dft2_data_redcapr_raw |> sjmisc::frq(dft2_0_email) ## all lower letters
+
 
 ## .. replace email of mock record by NA ----
-dft2_data_redcapr_raw[dft2_0_email %in% email_tester, dft2_0_email := NA]
+dft2_data_redcapr_raw[dft2_0_email %in% tolower(email_tester), dft2_0_email := NA]
+
+dft2_data_redcapr_raw |> sjmisc::frq(dft2_0_email) # OK
 
 
 ## .. dft2_0_conflicts ----
-## update according to responses
-dft2_data_redcapr_raw[dft2_0_conflicts %like% 'aucun|0|None', dft2_0_conflicts := 'Aucun']
+## update according to responses --
 
-dft2_data_redcapr_raw[dft2_0_conflicts == "Aucun financier ou advisory board.", dft2_0_conflicts := 'Aucun']
+dft2_data_redcapr_raw[, dft2_0_conflicts_raw := dft2_0_conflicts]
 
 dft2_data_redcapr_raw[, dft2_0_conflicts] |> sjmisc::frq()
+
+## Modified in 000_parameters.R --
+# conflicts_keywords <- 'aucun|0|none|pas de|ras' 
+
+dft2_data_redcapr_raw[tolower(dft2_0_conflicts) %like% conflicts_keywords, dft2_0_conflicts := 'Aucun']
+
+dft2_data_redcapr_raw[, dft2_0_conflicts] |> sjmisc::frq()
+
+## check recoding and save xlsx --
+chk_dft2_0_conflicts <-
+  dft2_data_redcapr_raw[, .N, .(dft2_0_conflicts_raw, dft2_0_conflicts)]
+
+chk_dft2_0_conflicts
+
+
+chk_dft2_0_conflicts %>%
+  writexl::write_xlsx(path = here::here('output', 'checks', 'chk_dft2_0_conflicts.xlsx'))
+
 
 ## 2. dft2_metadata -------------------------------------------------
 ## .. create variable_label ----
@@ -58,14 +117,9 @@ dft2_metadata[field_name %like%  '[a-d]_comment$',
                                        comment_txt_plural)]
 
 ## various fields
-dft2_metadata[field_name == 'dft2_0_gender',    variable_label := label_gender_short]
-dft2_metadata[field_name == 'dft2_0_job',       variable_label := label_job_short]
-dft2_metadata[field_name == 'dft2_0_job_o',     variable_label := label_job_o_short]
 
-dft2_metadata[field_name == 'dft2_0_joblang',   variable_label := label_joblang_short]
+dft2_metadata[dt_labels_cols_0, on = .(field_name), variable_label := labels_cols_0_short]
 
-dft2_metadata[field_name == 'dft2_0_email',     variable_label := label_email_short]
-dft2_metadata[field_name == 'dft2_0_conflicts', variable_label := label_conflicts_short]
 
 
 ## .. correct dft2_0b_s1_type1 ----
@@ -193,11 +247,10 @@ chk1 <-
 ## 4. Define some lists ---------------------------------------------
 ## . create list of names of variables per type of question ----
 ## which will be used below
-## .. cols_0_subset ----
+
+## .. cols_0_subsets >> DONE in 000_parameters.R ----
 ## check in 01a_xx.R that there is no change
 
-cols_0_subset <- c('dft2_0_gender', 'dft2_0_job', 'dft2_0_joblang')
-cols_0_subset
 
 ## .. cols_type1 ----
 # cols <- grep("_type2$", names(dft2_data_redcapr_raw), value = TRUE)
@@ -223,7 +276,7 @@ cols_type3
 ## . list_vars_with_value_labels ----
 ## variables with value labels (levels)
 ## all except type3 : levels are separate variables with __
-list_vars_with_value_labels <- c(cols_0_subset,
+list_vars_with_value_labels <- c(cols_0_subset_value_labels,
                                  cols_type1,
                                  cols_type2)
 
@@ -304,6 +357,25 @@ if (length(cols_type3) > 0) {
   dft2_lookup_final <- dft2_lookup_initial
 }
 
+(old <- names(dt_labels_cols_0))
+(new <- names(dft2_lookup_final))
+setnames(dt_labels_cols_0, old, new)
+
+
+
+identical(names(dft2_lookup_final),
+          names(dt_labels_cols_0))
+
+
+if (length(dt_labels_cols_0) > 0) {
+  dft2_lookup_final <- 
+    rbind(dft2_lookup_final,
+          dt_labels_cols_0
+    )
+}
+
+dft2_lookup_final
+
 dft2_lookup_final[, variable_label := clean_variable_label(variable_label, thankyou_string)]
 
 
@@ -324,7 +396,7 @@ dft2_data_redcapr_1 <- dft2_data_redcapr_raw[!is.na(dft2_0_email), ]
 ### 6.b conditional deduplication ----
 ## .. check if any email is duplicated ----
 # anyDuplicated returns a integer value with the index of first duplicate. If none exists, 0L is returned.
-anyDuplicated(dft2_data_redcapr_1[, dft2_0_email])
+anyDuplicated(dft2_data_redcapr_1[, dft2_0_email])  ## index of first duplicate ! not number of duplicates !
 
 
 if (anyDuplicated(dft2_data_redcapr_1[, dft2_0_email]) == 0) {
@@ -345,8 +417,10 @@ if (anyDuplicated(dft2_data_redcapr_1[, dft2_0_email]) == 0) {
   id_duplicated
 
 
-  message_emails_duplicated <- glue::glue("there are {length(emails_duplicated)} duplicate emails in rows {list(id_duplicated)} : {list(emails_duplicated)} ")  
-
+  message_emails_duplicated <- glue::glue("there are {length(emails_duplicated)} duplicate emails:
+                                          - in rows {list(id_duplicated)}
+                                          - {list(emails_duplicated)} ")  
+  message_emails_duplicated
 
 
   ###  .. data_deduplicated ----
@@ -371,6 +445,7 @@ if (anyDuplicated(dft2_data_redcapr_1[, dft2_0_email]) == 0) {
   data_deduplicated <- 
     data_deduplicated %>% clean_after_collapse(cols_numeric)
 
+  # chk_participants_deduplicated <- data_deduplicated[dft2_0_email %in% email_to_check, ]
   # foo4 <- data_deduplicated[, names(.SD), .SDcols = is.numeric] 
   # foo4
   # identical(cols_numeric, c('record_id', foo4)) ## FALSE because all the values with ';'
@@ -410,7 +485,7 @@ if (anyDuplicated(dft2_data_redcapr_1[, dft2_0_email]) == 0) {
   foo2[value %like% '; NA', .N] 
   
   ## . recode record_id : keep the latest ----
-  dt0[, record_id := get_last(record_id)]
+  dt0[, record_id := get_last(record_id), keyby = dft2_0_email]
 
   ### .. dft2_data_almost_clean -----------------------------------------------------
   ### add dt0 to data_deduplicated ---
@@ -442,7 +517,7 @@ if (anyDuplicated(dft2_data_redcapr_1[, dft2_0_email]) == 0) {
 
 
   ## .. update class to numeric ----
-  class(dft2_data_clean$dft2_z_s2_type3___1)
+  # class(dft2_data_clean$dft2_z_s2_type3___1)
 
   foo3 <- dft2_data_clean[, names(.SD), .SDcols = is.numeric] 
   foo3
@@ -454,7 +529,7 @@ if (anyDuplicated(dft2_data_redcapr_1[, dft2_0_email]) == 0) {
   foo4
   identical(cols_numeric, foo4)
   
-  class(dft2_data_clean$dft2_z_s2_type3___1)
+  # class(dft2_data_clean$dft2_z_s2_type3___1)
 
 
 }
@@ -526,12 +601,28 @@ for (i in 1:nrow(dt_choices)) {
 ## have a quick look at the 10th element of the list
 dft2_lookup_value_labels[10]
 
+## . dft2_lookup_value_labels_intermediate ----
+## simple rbindlist to unnest !
+
+dft2_lookup_value_labels_intermediate <- data.table::rbindlist(dft2_lookup_value_labels)
+
+# dft2_data_clean[, .(dft2_0_gender, dft2_0_job, dft2_0_joblang)] %>% sjmisc::frq()
+
+
 ## . dft2_lookup_value_labels_final ----
-## rbindlist to unnest
+## rbind if 'dft2_value_labels_manual' exists - this manual table could be created in 000_parameters.R in case of creating a new categorical variable
 
-dft2_lookup_value_labels_final <- data.table::rbindlist(dft2_lookup_value_labels)
-
-dft2_data_clean[, .(dft2_0_gender, dft2_0_job, dft2_0_joblang)] %>% sjmisc::frq()
+if(exists('dft2_value_labels_manual') == TRUE) {
+  identical(names(dft2_lookup_value_labels_intermediate),
+            names(dft2_value_labels_manual))
+  
+  ## rbind to add the manually created list of labels
+  dft2_lookup_value_labels_final <-  
+    rbind(dft2_lookup_value_labels_intermediate, dft2_value_labels_manual)
+} else {
+  dft2_lookup_value_labels_final <-  
+    dft2_lookup_value_labels_intermediate
+}
 
 
 
@@ -599,6 +690,17 @@ purrr::walk2(dft2_zzz_type1$gg, dft2_zzz_type1$img_path, function(gg, path){
   dev.off()
 })
 
+## .. Quick look at the dataset ----
+t0_clean <- 
+  dft2_data_clean[, .SD, .SDcols = !cols_to_exclude]  |> 
+  gtsummary::tbl_summary()
+
+t0_clean
+
+t0_clean |>
+  gtsummary::as_gt() |>
+  gt::tab_header(title = "Descrpition of variables from dft2_data_clean (without comments and email)") |>
+  gt::gtsave(filename = here::here('output', 'checks', 't0_clean_data_descriptive.docx'))
 
 ## 10. save ----------------------------------------------------------
 

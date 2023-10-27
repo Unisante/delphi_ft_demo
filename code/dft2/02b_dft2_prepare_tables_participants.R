@@ -1,6 +1,6 @@
 ## 02b_dft2_prepare_tables_participants.R
 ## olivier.duperrex@unisante.ch
-## 2023-03-21
+## 2023-10-24
 
 ## . > cols_type1 ----
 ## select cols endign with _type1
@@ -39,7 +39,10 @@ if('responses_participant' %in% names(dft2_type1_zz_combined)) {
 
 ## left join to add responses_participant
 ## last part with := needed to keep all variables
-dft2_type1_zz_combined_id_selected <- dft2_type1_zz_combined[dft2_type1_zz0_id_selected, on = 'variable', responses_participant := responses_participant] 
+dft2_type1_zz_combined_id_selected <- 
+  dft2_type1_zz_combined[dft2_type1_zz0_id_selected, 
+                         on = 'variable', 
+                         responses_participant := responses_participant] 
 
 dft2_type1_zz_combined_id_selected %>% names()
 
@@ -79,9 +82,12 @@ if (length(cols_type2) > 0) {
   
   
   dft2_type2_zz1_id_selected <-
-    dft2_type2_zz1[dft2_type2_zz0_id_selected, on = .(variable, item), responses_participant := responses_participant][order(variable,
-                                                                                                                             item %like% "Pas d'avis",
-                                                                                                                             -prop)] # here we reorder to make sure they come out in descending order
+    dft2_type2_zz1[dft2_type2_zz0_id_selected,
+                   on = .(variable, item),
+                   responses_participant := responses_participant
+    ][order(variable,
+            item %like% "Pas d'avis",
+            -prop)] # here we reorder to make sure they come out in descending order
   
   dft2_type2_zz1_id_selected[, responses_participant := fifelse(responses_participant == 1, 'X', '')]
   # dft2_type2_zz1_id_selected
@@ -91,12 +97,9 @@ if (length(cols_type2) > 0) {
   names(dft2_type2_zz1_id_selected)
   
   dft2_type2_zz1_id_selected <- dft2_type2_zz1_id_selected[order(
-    variable,
-    ## ... variable name
-    value_labels %like% no_op_short,
-    ## ... no opinion: no then yes
-    value_labels %like% other_please_short,
-    ## ... other : no then yes-prop                                    ## ... decreasing proportion
+    variable,                                 ## ... variable name
+    value_labels %like% no_op_short,          ## ... no opinion: no then yes
+    value_labels %like% other_please_short    ## ... other : no then yes-prop 
   )]
   
 }
@@ -154,12 +157,9 @@ if (length(cols_type3) > 0) {
   ### .  order rows according to results ----
   ## this will sort the table by ... and keep no opinion and other at the end
   dft2_type3_zz1_id_selected <- dft2_type3_zz1_id_selected[order(
-    variable,
-    ## ... variable name
-    value_labels %like% no_op_short,
-    ## ... no opinion: no then yes
-    value_labels %like% other_please_short,
-    ## ... other : no then yes-prop                                    ## ... decreasing proportion
+    variable,                                ## ... variable name
+    value_labels %like% no_op_short,         ## ... no opinion: no then yes
+    value_labels %like% other_please_short,  ## ... other : no then yes-prop
   )]
 }
 
