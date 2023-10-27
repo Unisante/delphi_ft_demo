@@ -149,97 +149,97 @@ chk1 <-
 ## all variables with _0b_ should have named with _z_
 ## here we correct this by code, in dft2_data_redcapr_raw and in dft2_metadata
 
-# pattern_colname_old <- '_0b'
-# pattern_colname_new <- '_z'
-# 
-# ## check the names to update
+pattern_colname_old <- '_0b'
+pattern_colname_new <- '_z'
+
+## check the names to update
+dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(pattern_colname_old)] # ok
+
+
+## update the names (defined in 00_functions.R)
+update_statement_name(
+  dt = dft2_data_redcapr_raw,
+  metadata = dft2_metadata,
+  pattern_colname_old,
+  pattern_colname_new
+)
+
+## check update worked
 # dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(pattern_colname_old)] # ok
-# 
-# 
-# ## update the names (defined in 00_functions.R)
-# update_statement_name(
-#   dt = dft2_data_redcapr_raw,
-#   metadata = dft2_metadata,
-#   pattern_colname_old,
-#   pattern_colname_new
-# )
-# 
-# ## check update worked
-# # dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(pattern_colname_old)] # ok
-# dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(pattern_colname_new)] # ok
-# 
-# dft2_metadata[field_name %like% pattern_colname_old, .(field_name)] # empty
-# dft2_metadata[field_name %like% pattern_colname_new, .(field_name)] # ok
-# 
-# ## .. rename two variables that are in 0b but had _a_ by mistake ------
-# 
-# ## ... dft2_a_s2 -> dft2_z_s2 ----
-# statement_to_update <- '_s2_'
-# 
-# pattern_colname_old <- paste0('_a', statement_to_update)
-# pattern_colname_new <- paste0('_z', statement_to_update)
-# 
-# ## check the names to update
-# dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(statement_to_update)] # ok
-# 
-# ## update the names
-# update_statement_name(
-#   dt = dft2_data_redcapr_raw,
-#   metadata = dft2_metadata,
-#   pattern_colname_old,
-#   pattern_colname_new
-# )
-# 
-# ## check update worked
-# dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(statement_to_update)] # ok
-# 
-# dft2_metadata[field_name %like% statement_to_update, .(field_name)]
-# 
-# ## ... dft2_a_s3 -> dft2_0z_s3 ----
-# statement_to_update <- '_s3_'
-# 
-# pattern_colname_old <- paste0('_a', statement_to_update)
-# pattern_colname_new <- paste0('_z', statement_to_update)
-# 
-# update_statement_name(
-#   dt = dft2_data_redcapr_raw,
-#   metadata = dft2_metadata,
-#   pattern_colname_old,
-#   pattern_colname_new
-# )
-# 
-# dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(statement_to_update)] # ok
+dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(pattern_colname_new)] # ok
+
+dft2_metadata[field_name %like% pattern_colname_old, .(field_name)] # empty
+dft2_metadata[field_name %like% pattern_colname_new, .(field_name)] # ok
+
+## .. rename two variables that are in 0b but had _a_ by mistake ------
+
+## ... dft2_a_s2 -> dft2_z_s2 ----
+statement_to_update <- '_s2_'
+
+pattern_colname_old <- paste0('_a', statement_to_update)
+pattern_colname_new <- paste0('_z', statement_to_update)
+
+## check the names to update
+dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(statement_to_update)] # ok
+
+## update the names
+update_statement_name(
+  dt = dft2_data_redcapr_raw,
+  metadata = dft2_metadata,
+  pattern_colname_old,
+  pattern_colname_new
+)
+
+## check update worked
+dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(statement_to_update)] # ok
+
+dft2_metadata[field_name %like% statement_to_update, .(field_name)]
+
+## ... dft2_a_s3 -> dft2_0z_s3 ----
+statement_to_update <- '_s3_'
+
+pattern_colname_old <- paste0('_a', statement_to_update)
+pattern_colname_new <- paste0('_z', statement_to_update)
+
+update_statement_name(
+  dt = dft2_data_redcapr_raw,
+  metadata = dft2_metadata,
+  pattern_colname_old,
+  pattern_colname_new
+)
+
+dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(statement_to_update)] # ok
 
 
 ## .. rename variables 'comment_bis' ---------------------------------
 ## patterns ---
-# pattern_colname_old <- '_comment_bis'
-# pattern_colname_new <- '_comment'
-# 
-# cols_comments_bis <- dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(pattern_colname_old)]
-# cols_comments_bis
-# 
-# cols_comments_to_rename <- cols_comments_bis %>% stringr::str_replace_all(pattern_colname_old, pattern_colname_new)
-# cols_comments_to_rename
-# 
-# ## ... rename in dft2_data_redcapr_raw --- 
-# dft2_data_redcapr_raw %>% setnames(cols_comments_bis, cols_comments_to_rename)
-# 
-# ## check---
-# dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(pattern_colname_new)]
-# 
-# 
-# ## ... rename in dft2_metadata ---
-# ## check names old exists
-# dft2_metadata[field_name %like% pattern_colname_old, ]
-# 
-# 
-# 
-# dft2_metadata[field_name %like% pattern_colname_old, 
-#          field_name := stringr::str_replace_all(field_name, pattern_colname_old, pattern_colname_new)]
-# 
-# ## check ---
-# dft2_metadata[field_name %like% pattern_colname_new, field_name]
+pattern_colname_old <- '_comment_bis'
+pattern_colname_new <- '_comment'
+
+cols_comments_bis <- dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(pattern_colname_old)]
+cols_comments_bis
+
+cols_comments_to_rename <- cols_comments_bis %>% stringr::str_replace_all(pattern_colname_old, pattern_colname_new)
+cols_comments_to_rename
+
+## ... rename in dft2_data_redcapr_raw ---
+dft2_data_redcapr_raw %>% setnames(cols_comments_bis, cols_comments_to_rename)
+
+## check---
+dft2_data_redcapr_raw[, names(.SD), .SDcols = patterns(pattern_colname_new)]
+
+
+## ... rename in dft2_metadata ---
+## check names old exists
+dft2_metadata[field_name %like% pattern_colname_old, ]
+
+
+
+dft2_metadata[field_name %like% pattern_colname_old,
+         field_name := stringr::str_replace_all(field_name, pattern_colname_old, pattern_colname_new)]
+
+## check ---
+dft2_metadata[field_name %like% pattern_colname_new, field_name]
 
 
 
@@ -691,8 +691,13 @@ purrr::walk2(dft2_zzz_type1$gg, dft2_zzz_type1$img_path, function(gg, path){
 })
 
 ## .. Quick look at the dataset ----
+cols_to_exclude_clean <-
+  grep("_email|_c$|_comment", names(dft2_data_redcapr_raw), value = TRUE)
+cols_to_exclude_clean
+
+
 t0_clean <- 
-  dft2_data_clean[, .SD, .SDcols = !cols_to_exclude]  |> 
+  dft2_data_clean[, .SD, .SDcols = !cols_to_exclude_clean]  |> 
   gtsummary::tbl_summary()
 
 t0_clean

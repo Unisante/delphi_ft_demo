@@ -398,6 +398,7 @@ if (length(cols_type2) > 0) {
   
   dft2_type2_zz1[, item := as.numeric(item)]
 }
+
 ## . ----
 ## 5. > cols_type3 --------------------------------------------------
 ### here we need to add no_opinion with a rbindlist as it is a separate variable for each question

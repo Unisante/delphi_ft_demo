@@ -300,6 +300,11 @@ labels_0b_s1 <- 'Enoncé 1 : Les Puff Bars représentent un problème pour la sa
 separator_comment_statements <- "destin" ## used with demo data
 # separator_comment_statements <- " to qualify"
 
+## . text_comment_end_variable : possible end of comment variables ----
+## if other than _comment$ might need to be recoded in 01b_dft2_recode_data.R
+text_comment_end_variable <- 
+  "_comment$|_comment_bis$"
+
 ## 3. elements for plots  -------------------------------------------
 ## 
 ## . tablec_aption_type1 ----
