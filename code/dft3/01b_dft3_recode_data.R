@@ -243,7 +243,7 @@ if (anyDuplicated(dft3_data_redcapr_1[, dft3_0_email]) == 0) {
   ### .. check questionnaire completed ----
   questionnaire_completed <- 
     dt0[, names(.SD), .SDcols = patterns('equestionnaire_complete')]
-  dt0[, questionnaire_completed] |> sjmisc::frq()
+  dt0[, ..questionnaire_completed] |> sjmisc::frq()
   
   ### .. cols_to_recode ----
   ### need to be modified if also type2 or type3 questions - see 01b_dft2_recode_data.R

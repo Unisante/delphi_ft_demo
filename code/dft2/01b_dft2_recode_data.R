@@ -456,7 +456,7 @@ if (anyDuplicated(dft2_data_redcapr_1[, dft2_0_email]) == 0) {
   ### .. check questionnaire complete ----
   questionnaire_completed <- 
     dt0[, names(.SD), .SDcols = patterns('equestionnaire_complete')]
-  dt0[, questionnaire_completed] |> sjmisc::frq()
+  dt0[, ..questionnaire_completed] |> sjmisc::frq()
   
   ### .. cols_to_recode ----
   cols_to_recode <- c(
