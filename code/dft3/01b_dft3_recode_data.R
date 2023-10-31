@@ -239,11 +239,17 @@ if (anyDuplicated(dft3_data_redcapr_1[, dft3_0_email]) == 0) {
 
   ### .. dt0 - subset with ones like ';' and recode with get_last ----
   dt0 <- data_deduplicated[record_id %like% ';',]
+
+  ### .. check questionnaire completed ----
+  questionnaire_completed <- 
+    dt0[, names(.SD), .SDcols = patterns('equestionnaire_complete')]
+  dt0[, questionnaire_completed] |> sjmisc::frq()
   
   ### .. cols_to_recode ----
-  ### # need to be modified if also type2 or type3 questions - see 01b_dft3_recode_data.R
-  cols_to_recode <- c(cols_type1) 
-  
+  ### need to be modified if also type2 or type3 questions - see 01b_dft2_recode_data.R
+  cols_to_recode <- c(
+    cols_type1,
+    questionnaire_completed) 
   ## for cols_type1 we get the last value that is not NA
   ## this allows respondants to change their mind
   dt0[, (cols_to_recode) := lapply(.SD, get_last), .SDcols = cols_to_recode, keyby = dft3_0_email]
