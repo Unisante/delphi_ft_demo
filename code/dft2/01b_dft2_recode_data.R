@@ -1,6 +1,6 @@
 ## 01b_dft2_recode_data.R ----
 ## olivier.duperrex@unisante.ch
-## 2023-10-24
+## 2023-11-02
 
 
 ## 0. Loading -----------------------------------------------------
@@ -63,6 +63,12 @@ dft2_data_redcapr_raw |> sjmisc::frq(dft2_0_email) ## all lower letters
 
 ## .. replace email of mock record by NA ----
 dft2_data_redcapr_raw[dft2_0_email %in% tolower(email_tester), dft2_0_email := NA]
+
+## >> .. exclude some participants according their record_id ----
+## recode that record_id to NA
+dft2_data_redcapr_raw[record_id %in% dft2_record_id_to_ignore, dft2_0_email := NA]
+
+dft2_data_redcapr_raw[is.na(dft2_0_email), record_id] 
 
 dft2_data_redcapr_raw |> sjmisc::frq(dft2_0_email) # OK
 

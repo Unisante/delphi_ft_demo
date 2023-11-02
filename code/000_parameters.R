@@ -1,6 +1,6 @@
 ## 000_parameters.R
 ## Prepared by olivier.duperrex@unisante.ch
-## Modified on 2023-10-27
+## Modified on 2023-11-02
 ## 
 ## Elements that can be modified according to the topic, the language,
 ## and desired adjustments on the output
@@ -40,6 +40,10 @@ email_tester <-
     'tester_2@some.email'
     )
 
+## >> .. exclude participants according to record_id ----
+## if several use c(111, 222)
+dft2_record_id_to_ignore <- ""
+dft3_record_id_to_ignore <- ""
 
 ## . reports titles -----------------------------------------------
 project_text <- "Delphi fast-track – Puff Bars"

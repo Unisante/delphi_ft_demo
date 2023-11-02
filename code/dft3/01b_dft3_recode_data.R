@@ -1,6 +1,6 @@
 ## 01b_dft3_recode_data.R ----
 ## olivier.duperrex@unisante.ch
-## 2023-10-24
+## 2023-11-02
 
 
 ## NOTE in round 3 only type1 => simplified code
@@ -70,6 +70,12 @@ t0 |>
 dft3_data_redcapr_raw |> sjmisc::frq(dft3_0_email) ## some have capital letters
 
 dft3_data_redcapr_raw[, dft3_0_email:= tolower(dft3_0_email)]  ## make all letters as lower
+
+## >> .. exclude some participants according their record_id ----
+## recode that record_id to NA
+dft3_data_redcapr_raw[record_id %in% dft3_record_id_to_ignore, dft3_0_email := NA]
+
+dft3_data_redcapr_raw[is.na(dft3_0_email), record_id] 
 
 dft3_data_redcapr_raw |> sjmisc::frq(dft3_0_email) ## all lower letters
 
