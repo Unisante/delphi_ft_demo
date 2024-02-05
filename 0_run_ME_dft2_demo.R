@@ -52,9 +52,11 @@ load(here::here('data', 'redcap_data_raw', 'dft2_data_redcapr_raw.RData'))
 ### .. number of rows with an email ----
 dft2_data_redcapr_raw[!is.na(dft2_0_email), .N]
 
-### ... emails_duplicated ----
-(emails_duplicated <- dft2_data_redcapr_raw[, if (.N > 1L) .(N = .N), dft2_0_email])
-(dt_emails_duplicated <- dft2_data_redcapr_raw[ , if (.N > 1L) .(record_id = record_id), keyby = .(dft2_0_email)])
+### ... dt_emails_duplicated ----
+
+(dt_emails_duplicated <-
+   dft2_data_redcapr_raw[, if (.N > 1L)
+     .(record_id = record_id), keyby = .(tolower(dft2_0_email))])
 
 
 
@@ -63,6 +65,23 @@ dft2_data_redcapr_raw[!is.na(dft2_0_email), .N]
 ### ..  01b_dft2_recode_data.R ----
 source(here::here('code', 'dft2', '01b_dft2_recode_data.R'),
        encoding = 'UTF-8')
+
+### .. total_participants_round_2 ----
+(total_participants_round_2 <- dft2_data_clean[, .N])
+
+(total_participants_round_2_complete <- 
+    dft2_data_clean[round_2_equestionnaire_complete > 0,.N])
+
+(total_participants_round_2_NA_n <- 
+    dft2_data_clean[is.na(round_2_equestionnaire_complete) | round_2_equestionnaire_complete == 0, .N])  ## should be 0
+
+dt_participants_round_2_NA <-
+  dft2_data_clean[is.na(round_2_equestionnaire_complete) | round_2_equestionnaire_complete == 0, ]
+
+(dt_emails_duplicated_after_cleaning <-
+    dft2_data_clean[, if (.N > 1L)
+      .(record_id = record_id), keyby = .(tolower(dft2_0_email))]) ## should be an empty table
+
 
 ## .. 01c_dft2_define_cols.R ----
 ## DO NOT RUN : called by 02a_xx.R, xx_report_generic.Rmd and xx_report_per_participant.Rmd

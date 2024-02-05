@@ -50,10 +50,7 @@ load(here::here('data', 'redcap_data_raw', 'dft3_data_redcapr_raw.RData'))
 ### .. number of rows with an email ----
 dft3_data_redcapr_raw[!is.na(dft3_0_email), .N]
 
-### ... emails_duplicated ----
-(emails_duplicated <-
-   dft3_data_redcapr_raw[, if (.N > 1L)
-     .(N = .N), tolower(dft3_0_email)])
+### ... dt_emails_duplicated ----
 
 (dt_emails_duplicated <-
     dft3_data_redcapr_raw[, if (.N > 1L)
@@ -74,14 +71,14 @@ source(here::here('code', 'dft3', '01b_dft3_recode_data.R'),
     dft3_data_clean[round_3_equestionnaire_complete > 0,.N])
 
 (total_participants_round_3_NA_n <- 
-    dft3_data_clean[is.na(round_3_equestionnaire_complete) | round_3_equestionnaire_complete == 0,.N])
+    dft3_data_clean[is.na(round_3_equestionnaire_complete) | round_3_equestionnaire_complete == 0, .N])  ## should be 0
 
 dt_participants_round_3_NA <-
   dft3_data_clean[is.na(round_3_equestionnaire_complete) | round_3_equestionnaire_complete == 0, ]
 
 (dt_emails_duplicated_after_cleaning <-
     dft3_data_clean[, if (.N > 1L)
-      .(record_id = record_id), keyby = .(tolower(dft3_0_email))])
+      .(record_id = record_id), keyby = .(tolower(dft3_0_email))]) ## should be an empty table
 
 
 ## .. 01c_dft3_define_cols.R ----
