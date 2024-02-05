@@ -19,4 +19,4 @@ token_dft3 <- "ZZZZZZZZZZZZZZZZ"
 
 ## Note
 ## . 'token_delphi_ft_this_project.R' has been added to .gitgnore to avoid transmitting the data to a git depot
-## . if you use other means to share your work, alway delete the files containing your details to login into your redcap server
+## . if you use other means to share your work, alwayd delete the files containing your details to login into your redcap server

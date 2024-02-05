@@ -59,14 +59,77 @@ dft2_data_redcapr_raw[!is.na(dft2_0_email), .N]
      .(record_id = record_id), keyby = .(tolower(dft2_0_email))])
 
 
+## >> . checks on raw data by type of questions ----
+cols_0 <- grep("_0_", names(dft2_data_redcapr_raw), value = TRUE)
+cols_0
+
+cols_type1 <- grep("_type1$", names(dft2_data_redcapr_raw), value = TRUE)
+cols_type1
+
+cols_type2 <- grep("_type2$", names(dft2_data_redcapr_raw), value = TRUE)
+cols_type2
+
+cols_type3 <- grep("_type3___", names(dft2_data_redcapr_raw), value = TRUE)
+cols_type3
+
+## .. chk_cols_0_raw ----
+if (length(cols_0) > 0) {
+  chk_cols_0_raw <-
+    dft2_data_redcapr_raw[, .SD, .SDcols = patterns('_0_'), keyby = record_id] %>%
+    data.table::transpose(keep.names = 'variable')
+  
+  class(chk_cols_0_raw)
+  chk_cols_0_raw
+  
+  chk_cols_0_raw %>%
+    writexl::write_xlsx(path = here::here('output', 'checks', 'chk_cols_0_raw.xlsx'))
+  
+}
+
+## .. chk_type1_raw ----
+if (length(cols_type1) > 0) {
+  chk_type1_raw <-
+    dft2_data_redcapr_raw[, .SD, .SDcols = patterns('_type1$'), keyby = record_id] %>%
+    data.table::transpose(keep.names = 'variable')
+  
+  class(chk_type1_raw)
+  chk_type1_raw
+  
+  chk_type1_raw %>%
+    writexl::write_xlsx(path = here::here('output', 'checks', 'chk_dft2_type1_raw.xlsx'))
+  
+}
+
+## .. chk_type2_raw ----
+if (length(cols_type2) > 0) {
+  chk_type2_raw <-
+    dft2_data_redcapr_raw[, .SD, .SDcols = patterns('_type2$'), keyby = record_id] %>%
+    data.table::transpose(keep.names = 'variable')
+  
+  
+  chk_type2_raw %>%
+    writexl::write_xlsx(path = here::here('output', 'checks', 'chk_dft2_type2_raw.xlsx'))
+}
+
+## .. chk_type3_raw ----
+if (length(cols_type3) > 0) {
+  chk_type3_raw <-
+    dft2_data_redcapr_raw[, .SD, .SDcols = patterns('_type3__'), keyby = record_id] %>%
+    data.table::transpose(keep.names = 'variable')
+  
+  
+  chk_type3_raw %>%
+    writexl::write_xlsx(path = here::here('output', 'checks', 'chk_dft2_type3_raw.xlsx'))
+}
+
 
 ## . ----
 ## . recode and summary tables  ----
-### ..  01b_dft2_recode_data.R ----
+## ..  01b_dft2_recode_data.R ----
 source(here::here('code', 'dft2', '01b_dft2_recode_data.R'),
        encoding = 'UTF-8')
 
-### .. total_participants_round_2 ----
+## .. total_participants_round_2 ----
 (total_participants_round_2 <- dft2_data_clean[, .N])
 
 (total_participants_round_2_complete <- 
@@ -88,7 +151,7 @@ dt_participants_round_2_NA <-
 
 
 
-### .. 02a_prepare_tables_without_participant_id.R ----
+## .. 02a_prepare_tables_without_participant_id.R ----
 ### ignore the warning about melt.data.table : it is due to the collapsing step, and is dealt with in the code
 # suppressWarnings(
   source(here::here('code', 'dft2', '02a_dft2_prepare_tables_without_participant_id.R'),
