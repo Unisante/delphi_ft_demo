@@ -1,6 +1,6 @@
 ## 01b_dft3_recode_data.R ----
 ## olivier.duperrex@unisante.ch
-## 2023-11-02
+## 2023-11-07
 
 
 ## NOTE in round 3 only type1 => simplified code
@@ -353,6 +353,26 @@ dft3_data_clean[, (cols_type1) := lapply(.SD, sjlabelled::set_labels, labels = l
 ## . check levels have been updated not there ---
 dft3_data_clean %>% sjmisc::frq(cols_type1)
 
+## >> 7.b Exclude people who did NOT answer !! ----
+## inspired by https://stackoverflow.com/questions/54853646/r-returns-row-sum-as-zero-in-case-of-all-na
+## moved to parameters ----
+# cols_to_ignore <- c("dft3_0_email",
+#                     "record_id",
+#                     "round_3_equestionnaire_complete")
+
+dft3_data_clean[, no_answer := fifelse(rowSums(is.na(.SD)) == ncol(.SD),
+                                       TRUE, FALSE), .SDcols = !cols_to_ignore]
+
+dft3_data_clean |> 
+  sjmisc::frq(no_answer)
+
+
+dft3_data_clean <- 
+  dft3_data_clean[no_answer == FALSE,]
+
+dft3_data_clean |> 
+  sjmisc::frq(no_answer)
+
 
 
 
@@ -444,4 +464,8 @@ save(dft3_data_clean, file = here::here('data', 'dft3', 'dft3_data_clean.RData')
 save(dft3_lookup_final, file = here::here('data', 'dft3', 'dft3_lookup_final.RData'))
 
 
+dft3_data_clean |>
+  writexl::write_xlsx(path = here::here('output', 'checks', 'dft3_data_clean.xlsx'))
 
+dft3_lookup_final |>
+  writexl::write_xlsx(path = here::here('output', 'checks', 'dft3_lookup_final.xlsx'))

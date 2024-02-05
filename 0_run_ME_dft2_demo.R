@@ -108,3 +108,35 @@ source(here::here('code', 'dft2', '05_dft2_to_render_individual_reports.R'),
        encoding = 'UTF-8')
 
 
+
+## >>  .. table for individual emails << ----
+load(here::here('data', 'dft2', 'dft2_data_clean.RData'))
+
+dir_with_reports <- here::here('output', 'reports', 'dft2', 'report_by_participant')
+
+dir_with_reports
+
+foo1 <- 
+  dir_with_reports |> 
+  fs::dir_info() |> 
+  setDT()
+
+(date_produced <- foo1[, max(modification_time)] |> as.IDate())
+
+dft2_table_for_sending_individual_reports <- 
+  dft2_data_clean[, .(record_id, dft2_0_email)]
+
+dft2_table_for_sending_individual_reports[, path_to_attachment := paste0(
+  dir_with_reports,
+  "/",
+  "dft2_report_participant_",
+  record_id,
+  "_",
+  date_produced,
+  ".docx"
+)]
+
+dft2_table_for_sending_individual_reports %>%
+  writexl::write_xlsx(path = here::here('output', 'checks', 'dft2_table_for_sending_individual_reports.xlsx'))
+
+
