@@ -21,6 +21,11 @@ This document is part of a toolkit:
 Please go through the [Fast-track Delphi: user guide](https://github.com/Unisante/delphi-fast-track-user-guide) to discover the steps with demo data, see what it produces and then try it out.
 
 
+## Related publications
+
+See [Fast-track Delphi: user guide](https://github.com/Unisante/delphi-fast-track-user-guide).
+
+
 ## Citation
 
 Please use the following to cite this document :
