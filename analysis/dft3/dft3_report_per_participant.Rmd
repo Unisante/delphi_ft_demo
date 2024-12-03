@@ -72,11 +72,6 @@ knitr::opts_chunk$set(
 
 ```{r load_data, include=FALSE}
 
-## . local functions ----------------------------------------------
-source(here::here('code', '00_functions.R'), encoding = 'UTF-8')
-
-
-
 ## 0.b load libraries ----
 pacman::p_loaded()
 

@@ -35,7 +35,6 @@ list_record_id
 # list_record_id <- tail(list_record_id, n = 10)
 # list_record_id
 
-list_record_id
 
 for(i in 1:length(list_record_id)){
 

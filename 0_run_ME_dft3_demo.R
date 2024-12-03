@@ -146,11 +146,6 @@ source(here::here('code', 'dft3', '05_dft3_to_render_individual_reports.R'),
        encoding = 'UTF-8')
 
 
-### . 05_dft3_to_render_individual_reports.R ------------------------------
-### ### TAKES time ... have a coffee, a walk, a nice chat with someone ...
-source(here::here('code', 'dft3', '05_dft3_to_render_individual_reports.R'),
-       encoding = 'UTF-8')
-
 ## >>  .. table for individual emails << ----
 load(here::here('data', 'dft3', 'dft3_data_clean.RData'))
 

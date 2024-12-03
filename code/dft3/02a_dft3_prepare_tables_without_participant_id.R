@@ -94,13 +94,13 @@ dft3_t1_type1[, `:=`(
   section = extract_section(variable),
   type = extract_type(variable),
   statement_number = extract_statement_number(variable),
-  responses = glue::glue(
+  responses = glue::glue_data(
     "{reponses_count} ({formattable::percent(response_rate, 1)})",
-    .envir = .SD
+    .x = .SD
   ),
   # stats = glue::glue("{median} [{q1} - {q3}]\n({min} - {max})", .envir = .SD),
   # stats = glue::glue("[{q1} - {q3}]\n({min} - {max})", .envir = .SD),
-  stats = glue::glue("[{q1}-{q3}]\n({min}-{max})", .envir = .SD),
+  stats = glue::glue_data("[{q1}-{q3}]\n({min}-{max})", .x = .SD),
   iqr_range = as.numeric(q3) - as.numeric(q1)
 ), keyby = variable]
 

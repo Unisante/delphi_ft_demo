@@ -5,7 +5,7 @@ keyword <- 'situation'
 
 ## put the appropriate text in this section
 get_docx_to_pour(current_round, report_type, keyword)
-block_pour_docx(docx_to_get)
+officer::block_pour_docx(docx_to_get)
 ```
 
 
@@ -17,7 +17,7 @@ keyword <- 'method'
 
 ## put the appropriate text in this section
 get_docx_to_pour(current_round, report_type, keyword)
-block_pour_docx(docx_to_get)
+officer::block_pour_docx(docx_to_get)
 
 ```
 
